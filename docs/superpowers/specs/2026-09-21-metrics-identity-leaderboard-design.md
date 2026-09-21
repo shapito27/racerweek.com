@@ -52,6 +52,7 @@ All cookies are `HttpOnly; Secure; SameSite=Lax`. They are set only by the serve
 | `rw_oauth` | `/api/auth` | 10 min | signed `{state, pkce_verifier, t}` | 2 |
 | `rw_pending` | `/api` | 30 min | signed `{google_sub, t}` for a new account that hasn't claimed a name yet | 2 |
 
+- **Cookie paths are scoped to every endpoint that reads the cookie, not to where it is set.** `rw_pending` is set by `/api/auth/google/callback` but read by `/api/claim`, so it must stay `Path=/api`.
 - **Why server-set cookies:** Safari deletes script-writable storage after 7 days without a visit, but not cookies set by the site's own server (same origin, same IP). The 400-day lifetime is Chrome's maximum.
 - **No `devices` table:** the device ID is just a random value, so creating one costs no database write.
 - **Where the device ID comes from:** always from the cookie, never from a request body.
@@ -148,7 +149,7 @@ These do **not** make a run modified: `?daily`, `?debug`, `?QUALITY`, `?t`, `?lo
   - `dmax(T) = 24T + 0.3T²` when T ≤ 80.
   - `dmax(T) = 3840 + 72(T − 80)` when T > 80.
   - The 1% allows for the fixed-step integration overshoot (≈0.005·T). The +5 m allows for the 0.01 s rounding of short runs.
-- **Bonus ceiling:** `bonus ≤ 100·N(N+1)/2 + 25·N`, where `N = floor(2T) + 2`. This is loose on purpose: it rejects only garbage.
+- **Bonus ceiling:** `bonus ≤ 100·N(N+1)/2 + 25·N`, where `N = floor(2T) + 2`. This is loose on purpose: it rejects only garbage. `N` deliberately over-estimates the number of rows, because rows are ≥ 0.5 s apart only once the ramp ends and are further apart before that. Do not tighten it without replay data, or honest runs get rejected.
 
 Changing a speed constant in the game requires bumping `VERSION` and adding the new constants on the server in the same release. Eligibility can be recomputed later from the stored raw fields.
 
@@ -169,7 +170,7 @@ All SQL uses prepared statements with bound parameters.
 
 - **Body:** `{"batches": [Batch, …]}`, at most 10 batches and at most 64 KB. `Batch` has `v`, `batch_id`, `session` (`id`, `started_at`, `tester`, `nickname`, `version`, `platform`, `quality`, `utm`) and `runs` (1–20 runs).
 - **Validation is per batch.** The server:
-  - checks types and ranges;
+  - checks types and ranges, with `platform` limited to `touch`/`desktop`, `quality` to `low`/`high` and `cause` to `static`/`cutter`/`quit`. These are enums, not free text;
   - re-cleans the UTM values (see below) and the nickname (name rules, §9);
   - computes `eligible` and `best`.
 - Valid batches are written in one `DB.batch()` call using `INSERT OR IGNORE`.
@@ -209,7 +210,10 @@ The network is used only when `location.hostname === 'racerweek.com'` or `?api=1
 | `racerweek_run_<session_id>_<n>` | one unsealed run (array, fields 0–9) |
 | `racerweek_batch_<batch_id>` | one sealed batch, waiting for the server to confirm it |
 
-**IDs.** `batch_id` = `Date.now()` in base36, padded to 9 characters, then `-` and 16 hex characters from `crypto.getRandomValues`. If `crypto` is missing (for example `http://192.168.x.x` LAN testing), `Math.random` is used instead. `session_id` keeps the existing `makeSessionId()`.
+**IDs.** `batch_id` = `Date.now()` in base36, padded to 9 characters, then `-` and 16 hex characters from `crypto.getRandomValues`.
+- **Don't use `crypto.randomUUID`:** it only exists on secure origins, so it would be missing on `http://192.168.x.x` LAN testing. `getRandomValues` works everywhere.
+- **Fallback:** `Math.random` is used only if `window.crypto` is missing entirely.
+- **Session IDs:** `session_id` keeps the existing `makeSessionId()`.
 
 **Sealing.** Sealing groups a session's unsealed runs (in `n` order, at most 20 per batch) into a new batch key, and only then deletes those run keys. If a crash happens in between, a run can end up in two batches; the de-duplication rule in §5 handles that.
 
@@ -313,7 +317,8 @@ One added line: `queue runs R · batches B · last HTTP S`.
 **Flow**
 
 1. **Tap.** A hidden form sends `POST /api/auth/google/start`, with field `batches` holding all waiting batches as JSON.
-   - The server stores them exactly as `/api/batch` does. **Runs are stored before leaving the site.**
+   - The body is `application/x-www-form-urlencoded`, not JSON. The server reads the `batches` field, parses it, and runs the same per-batch validator and insert as `/api/batch`. **Runs are stored before leaving the site.**
+   - `/api/batch`'s "400 = unparseable JSON" rule does not apply here. A missing or broken `batches` field is ignored, and sign-in continues, because metrics must never block sign-in.
    - It creates `state` and a PKCE verifier (S256), sets `rw_oauth`, and replies `303` to Google's authorization endpoint with `response_type=code`, `scope=openid`, `prompt=select_account`, `code_challenge` and `state`.
    - The browser keeps its batch keys, because the navigation means it never sees a confirmation. After returning, it re-sends them; they come back as `dup` and are deleted.
 2. **`GET /api/auth/google/callback`.** The server:
@@ -367,6 +372,7 @@ One added line: `queue runs R · batches B · last HTTP S`.
 | D1 row-reads/day | small | small | 5M |
 | Storage growth | ~2 MB/day | ~4.5 MB/day | 500 MB per database |
 
+- **First visits:** the request figures include one `/api/me` call per first visit or Safari-wiped visit (≈ +1–2k/day). A first visit cannot be told apart from a wiped one without another cookie, so this call is accepted rather than avoided.
 - **When the free limit is hit:** only `/api` fails. Static files never invoke Functions, so the game keeps working and runs wait in the queue.
 - **Storage is the first limit,** at roughly 3–8 months. Check with `npx wrangler d1 info racerweek`.
 - **Upgrade trigger:** move to **Workers Paid ($5/month)** at about 400 MB or before the leaderboard is promoted, whichever comes first. Paid includes 5 GB of storage and 50M writes per month.
