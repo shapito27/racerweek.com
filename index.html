@@ -3,7 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>LANES</title>
+<title>Racerweek – Free Kuala Lumpur Racing Game</title>
+<meta name="description" content="Race through Kuala Lumpur in Racerweek, a free instant-play browser racing game. Dodge traffic, collect rewards and chase your best score across iconic KL districts.">
+<meta name="theme-color" content="#090b14">
+<link rel="canonical" href="https://racerweek.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://racerweek.com/">
+<meta property="og:title" content="Racerweek – Race Through Kuala Lumpur">
+<meta property="og:description" content="Dodge traffic and chase your best score through iconic Kuala Lumpur districts. Free, instant play, no download.">
+<meta property="og:site_name" content="Racerweek">
+<meta property="og:locale" content="en_MY">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":["VideoGame","WebApplication"],"name":"Racerweek","url":"https://racerweek.com/","description":"A free endless browser racing game set across iconic Kuala Lumpur districts.","genre":["Racing","Arcade"],"playMode":"SinglePlayer","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"GameApplication","offers":{"@type":"Offer","price":0,"priceCurrency":"MYR"}}
+</script>
 <style>
   html, body {
     margin: 0; padding: 0; background: #0b0d12; overflow: hidden;
@@ -37,10 +50,120 @@
     font: 11px/1.3 monospace; border: 1px solid #444; box-sizing: border-box;
   }
   #statsBox button { margin-top: 10px; padding: 10px 16px; font: 14px system-ui, sans-serif; }
+
+  /* Compact, crawlable launch screen above the Canvas game. */
+  #landing {
+    position: fixed; inset: 0; z-index: 10; overflow: hidden;
+    min-height: 100vh; min-height: 100dvh;
+    color: #f7f9ff; background: #090b14;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    transition: opacity 260ms ease, visibility 260ms ease;
+  }
+  #landing.is-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
+  #landingArt { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .landing-shade {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at 50% 52%, rgba(35,25,55,.16), transparent 58%);
+  }
+  .landing-shell {
+    position: relative; width: min(440px, calc(100% - 40px)); height: 100%;
+    margin: 0 auto; display: flex; flex-direction: column;
+  }
+  .landing-header {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 72px; padding-top: env(safe-area-inset-top);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 900; letter-spacing: .16em; }
+  .brand-mark {
+    width: 28px; height: 8px; border-radius: 2px; transform: skewX(-24deg);
+    background: linear-gradient(90deg, #ff3d81 0 48%, #ffd44d 48% 100%);
+    box-shadow: 0 0 22px rgba(255,61,129,.52);
+  }
+  .hero-copy {
+    width: 100%; margin: auto 0; transform: translateY(3vh);
+    text-shadow: 0 2px 18px rgba(0,0,0,.45);
+  }
+  .eyebrow {
+    margin: 0 0 13px; color: #6ff2e6; font-size: 12px; line-height: 1.2;
+    font-weight: 850; letter-spacing: .17em; text-transform: uppercase;
+  }
+  h1 { max-width: 720px; margin: 0; font-size: clamp(52px, 9.6vw, 72px); line-height: .97; letter-spacing: -.055em; }
+  .hero-description {
+    max-width: 410px; margin: 18px 0 23px; color: #c2c8d5;
+    font-size: 16px; line-height: 1.55; text-shadow: 0 2px 12px #080a12;
+  }
+  #launchForm { display: flex; gap: 9px; width: min(440px, 100%); }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  #playerName {
+    min-width: 0; flex: 1; height: 52px; box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,.19); border-radius: 10px;
+    padding: 0 16px; color: #fff; background: rgba(13,16,27,.84);
+    font: 650 16px/1 system-ui, sans-serif; outline: none;
+    box-shadow: inset 0 1px rgba(255,255,255,.04), 0 12px 30px rgba(0,0,0,.2);
+  }
+  #playerName::placeholder { color: #7f8797; }
+  #playerName:focus { border-color: #6ff2e6; box-shadow: 0 0 0 3px rgba(111,242,230,.12); }
+  #playButton {
+    height: 52px; min-width: 138px; border: 0; border-radius: 10px; padding: 0 19px;
+    color: #11131a; background: #ffd44d; cursor: pointer;
+    font: 900 14px/1 system-ui, sans-serif; letter-spacing: .075em;
+    box-shadow: 0 10px 30px rgba(255,195,51,.22); transition: transform 120ms ease, filter 120ms ease;
+  }
+  #playButton:not(:disabled):hover { filter: brightness(1.08); transform: translateY(-1px); }
+  #playButton:not(:disabled):active { transform: translateY(1px); }
+  #playButton:disabled { color: #9398a4; background: #2a2e38; cursor: wait; box-shadow: none; }
+  .route-list { margin: 16px 0 0; color: #969dad; font-size: 11px; font-weight: 700; letter-spacing: .07em; }
+  @media (max-width: 560px) {
+    .landing-shell { width: calc(100% - 36px); text-align: center; }
+    .landing-header { min-height: 58px; }
+    .hero-copy { margin: auto; padding-bottom: 5vh; transform: none; }
+    .eyebrow { margin-bottom: 9px; font-size: 10px; }
+    h1 { max-width: 330px; margin: auto; font-size: clamp(35px, 11.6vw, 48px); line-height: .95; }
+    .hero-description { max-width: 330px; margin: 12px auto 17px; font-size: 13px; line-height: 1.4; }
+    #launchForm { display: block; max-width: 340px; margin: auto; }
+    #playerName, #playButton { width: 100%; height: 48px; }
+    #playButton { margin-top: 8px; }
+    .route-list { margin-top: 11px; font-size: 9px; }
+  }
+  @media (max-height: 620px) and (max-width: 560px) {
+    .landing-header { min-height: 48px; }
+    .hero-copy { padding-bottom: 52px; }
+    .eyebrow { margin-bottom: 6px; }
+    h1 { font-size: 34px; }
+    .hero-description { margin: 8px auto 10px; font-size: 12px; }
+    #playerName, #playButton { height: 42px; }
+    .route-list { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #landing, #playButton { transition: none; }
+  }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<main id="landing" aria-labelledby="heroTitle">
+  <canvas id="landingArt" aria-hidden="true"></canvas>
+  <div class="landing-shade"></div>
+  <div class="landing-shell">
+    <header class="landing-header">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>RACERWEEK</div>
+    </header>
+    <section class="hero-copy">
+      <p class="eyebrow">The streets of KL are calling</p>
+      <h1 id="heroTitle">Race Through Kuala Lumpur</h1>
+      <p class="hero-description">Dodge traffic, collect rewards and chase your best score across iconic Kuala Lumpur districts.</p>
+      <form id="launchForm" autocomplete="on">
+        <label class="sr-only" for="playerName">Nickname (optional)</label>
+        <input id="playerName" name="nickname" type="text" inputmode="text" maxlength="20" autocomplete="nickname" placeholder="Nickname (optional)" aria-describedby="routeList">
+        <button id="playButton" type="submit" disabled>PREPARING…</button>
+      </form>
+      <p class="route-list" id="routeList">BUKIT BINTANG · PETALING STREET · KLCC · BATU CAVES</p>
+    </section>
+  </div>
+</main>
 <div id="safeAreaProbe" style="position:fixed; inset:0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); pointer-events:none; visibility:hidden;"></div>
 <div id="statsBox">
   <div>Session JSON (clipboard copy failed - select and copy manually):</div>
@@ -1205,12 +1328,12 @@ function klsY(P, s) { return P.HORIZON_Y + (P.PLAYER_Y - P.HORIZON_Y) * s; }
 
 /* ---- baked assets: blade signs with stacked vertical lettering ------------------------------ */
 function buildKLStreetAssets(makeCanvas, bake) {
-  const b = bake || 2, out = { blade: { heritage: [], modern: [], indian: [] }, flag: klsBakeFlagBanner(makeCanvas, 3), board: { heritage: [], modern: [], indian: [], once: {} }, sign: klsBakeRoadSigns(makeCanvas, 3) };
-  KL_BOARDS.heritage.forEach(function (B) { out.board.heritage.push(klsBakeBoard(makeCanvas, 3, B)); });
-  KL_BOARDS.modern.forEach(function (B) { out.board.modern.push(klsBakeBoard(makeCanvas, 3, B)); });
-  KL_BOARDS.indian.forEach(function (B) { out.board.indian.push(klsBakeBoard(makeCanvas, 3, B)); });
-  out.pillar = klsBakePillars(makeCanvas, 3); out.lampSpiral = klsBakeSpiralLamp(makeCanvas, 3);
-  for (const k in KL_BOARDS.once) out.board.once[k] = klsBakeBoard(makeCanvas, 3, KL_BOARDS.once[k]);
+  const b = bake || 2, out = { blade: { heritage: [], modern: [], indian: [] }, flag: klsBakeFlagBanner(makeCanvas, b), board: { heritage: [], modern: [], indian: [], once: {} }, sign: klsBakeRoadSigns(makeCanvas, b) };
+  KL_BOARDS.heritage.forEach(function (B) { out.board.heritage.push(klsBakeBoard(makeCanvas, b, B)); });
+  KL_BOARDS.modern.forEach(function (B) { out.board.modern.push(klsBakeBoard(makeCanvas, b, B)); });
+  KL_BOARDS.indian.forEach(function (B) { out.board.indian.push(klsBakeBoard(makeCanvas, b, B)); });
+  out.pillar = klsBakePillars(makeCanvas, b); out.lampSpiral = klsBakeSpiralLamp(makeCanvas, b);
+  for (const k in KL_BOARDS.once) out.board.once[k] = klsBakeBoard(makeCanvas, b, KL_BOARDS.once[k]);
   const W = 40, H = 132;
   for (const key in KL_BLADE_WORDS) {
     const list = KL_BLADE_WORDS[key];
@@ -2054,6 +2177,16 @@ const FIXED_DT = 1 / 60;
 
 let state = 'READY'; // READY, PLAYING, DEAD, PAUSED
 let readyStartMs = 0;
+// Heavy vector art is baked after the first paint. Until it is complete the
+// input path stays locked and render() draws a lightweight loading screen.
+let assetsReady = false, bootProgress = 0;
+
+// Conservative defaults for devices that expose their resource limits.
+// This only changes presentation resolution/LOD; gameplay and its seeded RNG
+// are untouched. A query override is useful for visual QA on any device.
+const forcedQuality = params.get('QUALITY');
+const lowResourceDevice = forcedQuality === 'low' || (forcedQuality !== 'high' &&
+  (((navigator.deviceMemory || 8) <= 4) || ((navigator.hardwareConcurrency || 8) <= 4)));
 
 let distance = 0, runTime = 0, nextRowDist = 90;
 let bonusTotal = 0, combo = 0, timeSinceLastNearMiss = 0;
@@ -2200,7 +2333,64 @@ function sendRemoteLog() {
    ============================================================ */
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
+const landing = document.getElementById('landing');
+const landingArt = document.getElementById('landingArt');
+const launchForm = document.getElementById('launchForm');
+const playerNameInput = document.getElementById('playerName');
+const playButton = document.getElementById('playButton');
+let landingVisible = true;
 let scale = 1, VIEW_H = 640, dpr = 1;
+
+document.documentElement.setAttribute('data-landing', '1');
+try { playerNameInput.value = localStorage.getItem('racerweek_player_name') || ''; } catch (e) {}
+
+/* One-shot atmospheric background. The launch screen intentionally contains
+   no illustrative imagery; only a quiet gradient and deterministic stars. */
+function renderLandingArt() {
+  if (!landingVisible || !landingArt) return;
+  const w = landingArt.clientWidth || window.innerWidth;
+  const h = landingArt.clientHeight || window.innerHeight;
+  const artDpr = Math.min(window.devicePixelRatio || 1, 2);
+  landingArt.width = Math.round(w * artDpr);
+  landingArt.height = Math.round(h * artDpr);
+  const g = landingArt.getContext('2d');
+  g.setTransform(artDpr, 0, 0, artDpr, 0, 0);
+
+  const sky = g.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, '#070811');
+  sky.addColorStop(0.68, '#090a14');
+  sky.addColorStop(1, '#100b19');
+  g.fillStyle = sky;
+  g.fillRect(0, 0, w, h);
+
+  // Deterministic stars: no gameplay RNG and no per-frame work.
+  for (let i = 0; i < 36; i++) {
+    const x = ((i * 83 + 37) % 557) / 557 * w;
+    const y = ((i * 47 + 19) % 211) / 211 * h * 0.9;
+    const a = 0.07 + (i % 4) * 0.035;
+    g.fillStyle = 'rgba(210,225,255,' + a + ')';
+    g.fillRect(x, y, 1, 1);
+  }
+}
+
+launchForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (!assetsReady || !landingVisible) return;
+  const nickname = playerNameInput.value.replace(/\s+/g, ' ').trim().slice(0, 20);
+  playerNameInput.value = nickname;
+  if (nickname) session.tester = nickname;
+  try {
+    if (nickname) localStorage.setItem('racerweek_player_name', nickname);
+    else localStorage.removeItem('racerweek_player_name');
+  } catch (err) {}
+  landingVisible = false;
+  document.documentElement.removeAttribute('data-landing');
+  landing.classList.add('is-leaving');
+  landing.setAttribute('aria-hidden', 'true');
+  ensureAudio();
+  beginRun(true);
+  setTimeout(function () { landing.style.display = 'none'; }, 280);
+});
 
 // v0.3 (R3): hoisted out of screenY so doResize can derive Z_NEAR from them.
 // Values themselves are unchanged (VIEW_H*0.22 / VIEW_H-130).
@@ -2232,7 +2422,7 @@ const streetStats = { quads: 0, buildings: 0, blits: 0 };
 function maybeRebuildKLSkyline() {
   const horizonY = screenY(CONFIG.Z_FAR);
   const skyScale = clamp((horizonY - 60) / 175, 0.8, 1.3);
-  const bakeFactor = Math.min(3, Math.ceil(scale * dpr));
+  const bakeFactor = Math.min(lowResourceDevice ? 1 : 2, Math.ceil(scale * dpr));
   if (klBaked && Math.abs(skyScale - klSkyScale) / klSkyScale <= 0.05 && bakeFactor === klBakeFactor) return;
   klSkyScale = skyScale;
   klBakeFactor = bakeFactor;
@@ -2282,7 +2472,7 @@ function doResize() {
   if (zNear <= asymptote) zNear = asymptote + 1; // stay clear of the perspective singularity
   Z_NEAR = zNear;
   streetP = { K: CONFIG.PERSP_K, LANE_W: CONFIG.LANE_W, HORIZON_Y: HORIZON_Y, PLAYER_Y: PLAYER_Y, Z_FAR: CONFIG.Z_FAR, Z_NEAR: Z_NEAR };
-  maybeRebuildKLSkyline();
+  if (assetsReady) { maybeRebuildKLSkyline(); renderLandingArt(); }
 }
 window.addEventListener('resize', doResize);
 window.addEventListener('orientationchange', doResize);
@@ -2340,6 +2530,7 @@ function onPointerDown(e) {
   if (debugOn && debugCopyBtn && inRect(pos.x, pos.y, debugCopyBtn)) { copyStats(); return; }
   if (inRect(pos.x, pos.y, muteRect)) { toggleMute(); return; }
   if (inRect(pos.x, pos.y, debugCornerRect)) registerDebugTap(nowMs);
+  if (!assetsReady) return;
 
   ensureAudio();
 
@@ -2378,10 +2569,13 @@ document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
 document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
 
 window.addEventListener('keydown', function (e) {
+  // The launch form owns keyboard input until the player explicitly starts.
+  if (landingVisible) return;
   const nowMs = performance.now();
   if (e.key === ' ' || e.key === 'Enter') {
     e.preventDefault();
     if (e.repeat) return;
+    if (!assetsReady) return;
     ensureAudio();
     if (state === 'READY') { beginRun(true); return; }
     if (state === 'PAUSED') { state = 'PLAYING'; lastFrameTs = null; accumulator = 0; return; }
@@ -4248,7 +4442,7 @@ function drawBarrierSprite(g, w, h) {
 /* VISUAL_SIZE.playerCar 0.80 x 0.62 - wide and low.
    Reads at 16px as: a wide dark bar (rear wing) over two fat tyres with
    a bright gap between them, one red dot low centre. */
-function drawF1Sprite(g, w, h, bodyColor, accentColor, opts) {
+function drawOpenWheelSprite(g, w, h, bodyColor, accentColor, opts) {
   opts = opts || {};
   const accent = accentColor || ACCENT_PLAYER;
   const carbon = opts.carbon || '#131923';
@@ -4389,7 +4583,7 @@ function drawF1Sprite(g, w, h, bodyColor, accentColor, opts) {
   g.fillStyle = '#ff7a1a';
   g.beginPath(); g.arc(cx, h * 0.600, w * 0.021, 0, TAU); g.fill();
 
-  /* FIA rain light housing - the render layer adds the bloom */
+  /* rear rain light housing - the render layer adds the bloom */
   g.fillStyle = '#12161d';
   drawRoundedRect(g, cx - w * 0.040, h * 0.640, w * 0.080, h * 0.070, w * 0.016); g.fill();
   g.fillStyle = linGrad(g, 0, h * 0.648, 0, h * 0.702, [
@@ -4427,7 +4621,7 @@ function drawF1Sprite(g, w, h, bodyColor, accentColor, opts) {
 
 
 /* ------------------- player car, variant B: aggressive ----------------
-   Same signature and same VISUAL_SIZE box as drawF1Sprite, so it is a
+   Same signature and same VISUAL_SIZE box as drawOpenWheelSprite, so it is a
    straight swap in buildSprites. Differences from variant A:
      - cambered rear tyres (tops leaning in) on a wider stance
      - raked, louvred endplates and a spoon-section wing with a Gurney lip
@@ -4435,7 +4629,7 @@ function drawF1Sprite(g, w, h, bodyColor, accentColor, opts) {
      - graphite bodywork with an accent chevron instead of a centre stripe
      - deeper diffuser, glowing throat, T-wing on the engine cover
    opts: accent2, carbon, rainLight, camber (radians, default 0.075)    */
-function drawF1SpriteB(g, w, h, bodyColor, accentColor, opts) {
+function drawOpenWheelSpriteB(g, w, h, bodyColor, accentColor, opts) {
   opts = opts || {};
   const accent = accentColor || PLAYER_ACCENT_RED;
   const carbon = opts.carbon || '#0f141c';
@@ -4738,23 +4932,26 @@ function drawF1SpriteB(g, w, h, bodyColor, accentColor, opts) {
   edgeLight(cx - w * 0.168, h * 0.670, cx + w * 0.168, h * 0.670, 0.24, w * 0.006);
 }
 
-/* --------------------- baking: 3x, per-visual aspect ----------------- */
+/* --------------- adaptive baking, per-visual aspect ----------------- */
 /* Logical density: 150px per lane unit, so every VISUAL_SIZE lands on a
    whole number and all five sprites share one texel density. */
 const SPRITE_PX_PER_LANE = 150;
-const SPRITE_DPR = 3;
+// The old fixed 3x bake spent memory and startup time on texels that could
+// never be displayed (the main canvas itself caps DPR at 2). Low-resource
+// devices use 1x; others match the useful display density up to 2x.
+const SPRITE_DPR = lowResourceDevice ? 1 : Math.max(1, Math.min(2, Math.ceil(window.devicePixelRatio || 1)));
 
 const sprites = {};
 function makeSprite(key, drawFn) {
   const sz = VISUAL_SIZE[key];
   const c = document.createElement('canvas');
-  c.width = Math.round(sz.w * SPRITE_PX_PER_LANE) * SPRITE_DPR;
-  c.height = Math.round(sz.h * SPRITE_PX_PER_LANE) * SPRITE_DPR;
+  c.width = Math.round(sz.w * SPRITE_PX_PER_LANE * SPRITE_DPR);
+  c.height = Math.round(sz.h * SPRITE_PX_PER_LANE * SPRITE_DPR);
   drawFn(c.getContext('2d'), c.width, c.height);
   sprites[key] = c;
 }
 function buildSprites() {
-  makeSprite('playerCar', function (g, w, h) { drawF1SpriteB(g, w, h, PALETTE.player, PLAYER_ACCENT_RED, {}); });
+  makeSprite('playerCar', function (g, w, h) { drawOpenWheelSpriteB(g, w, h, PALETTE.player, PLAYER_ACCENT_RED, {}); });
   makeSprite('hatchback', function (g, w, h) { drawCarSprite(g, w, h, PALETTE.cutter, '#16202e', { rearLight: '#ff4a2e' }); });
   registerKapcaiLiveries();
   makeSprite('coneRow', drawConeRowSprite);
@@ -5103,6 +5300,22 @@ function collectAndSort() {
 }
 
 function render() {
+  if (!assetsReady) {
+    ctx.fillStyle = PALETTE.bg;
+    ctx.fillRect(0, 0, 360, VIEW_H);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = PALETTE.text;
+    ctx.font = 'bold 30px system-ui, sans-serif';
+    ctx.fillText('LANES', 180, VIEW_H * 0.43);
+    ctx.font = '14px system-ui, sans-serif';
+    ctx.fillStyle = '#aab2c2';
+    ctx.fillText('PREPARING KUALA LUMPUR', 180, VIEW_H * 0.43 + 34);
+    ctx.fillStyle = '#272d3a';
+    ctx.fillRect(80, VIEW_H * 0.43 + 54, 200, 4);
+    ctx.fillStyle = PALETTE.bonus;
+    ctx.fillRect(80, VIEW_H * 0.43 + 54, 200 * bootProgress, 4);
+    return;
+  }
   ctx.fillStyle = PALETTE.bg;
   ctx.fillRect(0, 0, 360, VIEW_H);
 
@@ -5367,9 +5580,28 @@ function playNewBestSound() {
    METRICS / DEBUG
    ============================================================ */
 let fps = 60, fpsFrames = 0, fpsTimer = 0;
+const STREET_LOD_HIGH = [42, 75, 120];
+const STREET_LOD_LOW = [32, 58, 96];
+let streetLowDetail = lowResourceDevice;
+let lowFpsStreak = 0, highFpsStreak = 0;
+function applyStreetLOD(low) {
+  const q = low ? STREET_LOD_LOW : STREET_LOD_HIGH;
+  KL_STREET.LOD_NEAR = q[0]; KL_STREET.LOD_MID = q[1]; KL_STREET.LOD_FAR = q[2];
+  streetLowDetail = low;
+}
 function updateFPS(dt) {
   fpsFrames++; fpsTimer += dt;
-  if (fpsTimer >= 1) { fps = fpsFrames / fpsTimer; fpsFrames = 0; fpsTimer = 0; }
+  if (fpsTimer >= 1) {
+    fps = fpsFrames / fpsTimer; fpsFrames = 0; fpsTimer = 0;
+    if (state === 'PLAYING') {
+      lowFpsStreak = fps < 45 ? lowFpsStreak + 1 : 0;
+      highFpsStreak = fps > 56 ? highFpsStreak + 1 : 0;
+      if (!streetLowDetail && lowFpsStreak >= 2) applyStreetLOD(true);
+      else if (streetLowDetail && !lowResourceDevice && highFpsStreak >= 5) applyStreetLOD(false);
+    } else {
+      lowFpsStreak = 0; highFpsStreak = 0;
+    }
+  }
 }
 
 const runDurations = [];
@@ -5432,21 +5664,37 @@ document.getElementById('statsClose').addEventListener('click', function () {
    BOOT
    ============================================================ */
 loadPersisted();
-buildSprites();
-buildSkylineSprites();
-// v0.4: street furniture (blade signs) baked once at boot; palm/tree came
-// from the landmark pack's own bake and are attached right after, then
-// kept in sync by maybeRebuildKLSkyline whenever that rebakes.
-streetAssets = buildKLStreetAssets(makeCanvas, 2);
-if (klBaked) { streetAssets.palm = klBaked.palm; streetAssets.tree = klBaked.tree; }
-// v0.4 (2.2 budget note): measured peaks over a full run exceeded the
-// 650-quad/frame target (Bukit Bintang ~714, Jalan Petaling ~718, Batu
-// Caves ~655) at the pack's default LOD thresholds. Per the spec's own
-// guidance, tuning these down is the first fix, not removing roofs/
-// pavement - and this is a runtime override from the game side, not an
-// edit to the pasted kl-street.js content itself.
-KL_STREET.LOD_NEAR = 42; KL_STREET.LOD_MID = 75; KL_STREET.LOD_FAR = 120;
-if (params.has('selftest')) runSelfTest();
+applyStreetLOD(lowResourceDevice);
+
+// Each bake remains deterministic, but yielding between the large groups
+// lets the browser paint immediately and keeps the page responsive during
+// startup on slow phones. Gameplay cannot start until the queue completes.
+const bootTasks = [
+  function () { maybeRebuildKLSkyline(); },
+  function () { buildSprites(); },
+  function () { buildSkylineSprites(); },
+  function () {
+    streetAssets = buildKLStreetAssets(makeCanvas, lowResourceDevice ? 1 : 2);
+    if (klBaked) { streetAssets.palm = klBaked.palm; streetAssets.tree = klBaked.tree; }
+  }
+];
+let bootTaskIndex = 0;
+function runNextBootTask() {
+  if (bootTaskIndex >= bootTasks.length) {
+    assetsReady = true;
+    bootProgress = 1;
+    readyStartMs = performance.now();
+    document.documentElement.setAttribute('data-game-ready', '1');
+    playButton.disabled = false;
+    playButton.textContent = 'PLAY NOW';
+    renderLandingArt();
+    if (params.has('selftest')) runSelfTest();
+    return;
+  }
+  bootTasks[bootTaskIndex++]();
+  bootProgress = bootTaskIndex / bootTasks.length;
+  setTimeout(runNextBootTask, 0);
+}
 
 let lastFrameTs = null, accumulator = 0;
 
@@ -5476,8 +5724,10 @@ function frame(ts) {
   render();
 }
 
-readyStartMs = performance.now();
 requestAnimationFrame(frame);
+// Queue work only after the browser has had an opportunity to present the
+// lightweight loading frame above.
+requestAnimationFrame(function () { setTimeout(runNextBootTask, 0); });
 
 window.addEventListener('pagehide', function () {
   persistSession();
