@@ -38,11 +38,11 @@ Query parameters:
 
 For visual checks, test at least 360 x 780 (a tall phone), 360 x 560 (the shortest supported portrait ratio) and 1280 x 720 (desktop letterboxing and keyboard play).
 
-The landing-page nickname is optional. A non-empty value is normalized, limited to 20 characters, stored as `racerweek_player_name`, and copied into `session.tester` (so it overrides `?t=`). An empty value starts immediately with no tester name. `PLAY NOW` enters the game. After that, mobile uses Pointer Events and desktop uses Arrow Left/Right or A/D. Space/Enter resumes or retries.
+The landing-page nickname is optional, and the field is currently hidden (`hidden` on `#playerName` and its label; remove both to bring it back). A name saved earlier is still pre-filled into the hidden field and applied, so returning players keep their tester name. A non-empty value is normalized, limited to 20 characters, stored as `racerweek_player_name`, and copied into `session.tester` (so it overrides `?t=`). An empty value starts immediately with no tester name. `PLAY NOW` enters the game. After that, mobile uses Pointer Events and desktop uses Arrow Left/Right or A/D. Space/Enter resumes or retries.
 
 ## Landing page and search metadata
 
-The launch screen is a compact, image-free landing page (`#landing`, z-index 10, above `<canvas id="c">`). It has semantic HTML copy, the optional nickname field and a `PLAY NOW` button. It stays up while the assets bake, then goes straight into gameplay with no navigation or page load. The dark gradient and sparse stars are generated locally. There is no car, landmark montage, road, promotional image or external font.
+The launch screen is a compact landing page (`#landing`, z-index 10, above `<canvas id="c">`). It has semantic HTML copy, the optional nickname field (currently hidden) and a `PLAY NOW` button. It stays up while the assets bake, then goes straight into gameplay with no navigation or page load. The dark gradient and sparse stars are generated locally. Once the assets are baked, `drawLandingSkyline` adds a night skyline of baked `KL_LANDMARKS` along the bottom edge (`LANDING_SKYLINE_NARROW` spreads it under the centred copy; `LANDING_SKYLINE_WIDE` keeps it in the side gutters on desktop). It is drawn once, and again on resize, never per frame. There is no car, road, image file, promotional image or external font.
 
 The visible launch content must stay real DOM content, not Canvas-only text. The current search and sharing metadata:
 
@@ -87,7 +87,7 @@ Important data and rendering systems:
 ## Guardrails
 
 - Keep the one-file, vanilla ES2019, Canvas 2D implementation unless the user explicitly changes the delivery format.
-- Keep the image-free landing design unless the user explicitly asks for artwork. Its headline, description, form label and district list must stay real HTML for crawlability and accessibility.
+- The landing art is limited to the gradient, stars and the baked `KL_LANDMARKS` skyline: no image files, no car, no road. Ask before adding other artwork. Its headline, description, form label and district list must stay real HTML for crawlability and accessibility.
 - Do not add libraries, web fonts, network requests, runtime image dependencies, service workers, fullscreen calls or orientation locks.
 - Keep the logical width at 360, with variable logical height and responsive letterboxing.
 - Mobile portrait is the primary target, but desktop keyboard play must keep working.
@@ -109,7 +109,7 @@ After gameplay or rendering changes:
 
 1. Load the page with no console or page errors.
 2. Confirm the landing page is visible while booting, the button changes from `PREPARING…` to `PLAY NOW`, and `data-game-ready="1"` appears.
-3. Test both ways in: an empty nickname, and a named nickname (check it gets normalized). Both must dismiss the landing page and start play; only the named one should save a tester name.
+3. Test both ways in: no saved name, and a saved `racerweek_player_name` (check it gets normalized). Both must dismiss the landing page and start play; only the saved one should set a tester name. If the nickname field is visible again, also test typing a name. Check the landing skyline appears after `PLAY NOW` is enabled and does not cover the copy.
 4. Run `?selftest=1` and check the expected lines above.
 5. Check the launch, PLAYING, PAUSED, DEAD and retry states.
 6. Check every district: Bukit Bintang, Jalan Petaling, Pasar Seni, Little India, Dataran Merdeka, the silent Ilham stretch, KLCC and Batu Caves. Verify each announced zone's gate and transition. Ilham intentionally has no gate, title, chime or player-facing name, so a death there must report Dataran Merdeka as the last announced zone.

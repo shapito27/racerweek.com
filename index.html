@@ -114,6 +114,8 @@
   }
   #playButton:not(:disabled):hover { filter: brightness(1.08); transform: translateY(-1px); }
   #playButton:not(:disabled):active { transform: translateY(1px); }
+  /* Nickname field is hidden for now; the button takes the whole row. */
+  #playerName[hidden] + #playButton { flex: 1; margin-top: 0; }
   #playButton:disabled { color: #9398a4; background: #2a2e38; cursor: wait; box-shadow: none; }
   .route-list { margin: 16px 0 0; color: #969dad; font-size: 11px; font-weight: 700; letter-spacing: .07em; }
   @media (max-width: 560px) {
@@ -156,8 +158,8 @@
       <h1 id="heroTitle">Race Through Kuala Lumpur</h1>
       <p class="hero-description">Dodge traffic, collect rewards and chase your best score across iconic Kuala Lumpur districts.</p>
       <form id="launchForm" autocomplete="on">
-        <label class="sr-only" for="playerName">Nickname (optional)</label>
-        <input id="playerName" name="nickname" type="text" inputmode="text" maxlength="20" autocomplete="nickname" placeholder="Nickname (optional)" aria-describedby="routeList">
+        <label class="sr-only" for="playerName" hidden>Nickname (optional)</label>
+        <input hidden id="playerName" name="nickname" type="text" inputmode="text" maxlength="20" autocomplete="nickname" placeholder="Nickname (optional)" aria-describedby="routeList">
         <button id="playButton" type="submit" disabled>PREPARING…</button>
       </form>
       <p class="route-list" id="routeList">BUKIT BINTANG · PETALING STREET · KLCC · BATU CAVES</p>
@@ -2503,8 +2505,27 @@ let scale = 1, VIEW_H = 640, dpr = 1;
 document.documentElement.setAttribute('data-landing', '1');
 try { playerNameInput.value = localStorage.getItem('racerweek_player_name') || ''; } catch (e) {}
 
-/* One-shot atmospheric background. The launch screen intentionally contains
-   no illustrative imagery; only a quiet gradient and deterministic stars. */
+/* Landing skyline: [KL_LANDMARKS id, x, height in skyline units, alpha, skipGroups].
+   Narrow screens spread it across the full width under the centred copy (x = fraction of width).
+   Wide screens keep the copy column clear: x is a fraction of the side gutter, measured
+   from the left edge (L) or the right edge (R); C sits centred below the copy. Order = back to front. */
+const LANDING_SKYLINE_NARROW = [
+  ['exchange106', 0.58, 70, 0.55], ['sentralTowers', 0.74, 64, 0.8], ['merdeka118', 0.88, 150, 0.8],
+  ['hill', 0.10, 22, 1], ['klTower', 0.10, 96, 0.9],
+  ['ilhamTower', 0.62, 90, 0.9, ['podium', 'hatch', 'neighbour']], ['twinTowers', 0.40, 150, 1],
+  ['greatEasternMall', 0.66, 42, 1], ['sultanAbdulSamad', 0.19, 42, 1], ['batuCaves', 0.95, 44, 0.9]
+];
+const LANDING_SKYLINE_WIDE = [
+  ['exchange106', 'R', 0.58, 70, 0.55], ['sentralTowers', 'R', 0.80, 64, 0.8], ['merdeka118', 'R', 0.36, 150, 0.8],
+  ['hill', 'L', 0.14, 22, 1], ['klTower', 'L', 0.14, 96, 0.9],
+  ['ilhamTower', 'L', 0.70, 90, 0.9, ['podium', 'hatch', 'neighbour']], ['twinTowers', 'L', 0.44, 150, 1],
+  ['greatEasternMall', 'L', 0.84, 42, 1],
+  ['sultanAbdulSamad', 'C', 0, 36, 1], ['batuCaves', 'R', 0.08, 60, 0.9]
+];
+
+/* Background art, drawn once (and again on resize) while the landing page is up:
+   a quiet gradient, deterministic stars and, once the assets are baked, a night
+   skyline of baked KL_LANDMARKS. Nothing here runs per frame. */
 function renderLandingArt() {
   if (!landingVisible || !landingArt) return;
   const w = landingArt.clientWidth || window.innerWidth;
@@ -2530,6 +2551,40 @@ function renderLandingArt() {
     g.fillStyle = 'rgba(210,225,255,' + a + ')';
     g.fillRect(x, y, 1, 1);
   }
+  if (assetsReady) drawLandingSkyline(g, w, h, artDpr);
+}
+
+function drawLandingSkyline(g, w, h, bake) {
+  const gutter = (w - Math.min(440, w - 40)) / 2;       // .landing-shell width
+  const wide = w > 560 && gutter >= 280;
+  const u = wide ? Math.min(h * 0.42, 300, gutter * 1.6) / 160 : Math.min(h * 0.30, 230) / 160;
+  const base = h + 2;
+  const glow = g.createLinearGradient(0, base - 170 * u, 0, base);
+  glow.addColorStop(0, 'rgba(90,40,120,0)');
+  glow.addColorStop(1, 'rgba(120,50,110,.35)');
+  g.fillStyle = glow;
+  g.fillRect(0, base - 170 * u, w, 170 * u);
+
+  const items = wide ? LANDING_SKYLINE_WIDE : LANDING_SKYLINE_NARROW;
+  for (let i = 0; i < items.length; i++) {
+    const it = items[i];
+    const o = wide ? 1 : 0;                              // wide rows carry an extra side column
+    const x = !wide ? it[1] * w : it[1] === 'L' ? it[2] * gutter : it[1] === 'R' ? w - it[2] * gutter : w / 2;
+    const skip = (it[4 + o] || []).slice();
+    if (!CONFIG.BATU_STATUE) skip.push('statue');
+    const r = bakeLandmark(it[0], it[2 + o] * u, { bake: bake, skipGroups: skip }, makeCanvas);
+    const lift = it[0] === 'klTower' ? 22 * u * 0.8 : 0;   // stands on the hill
+    g.globalAlpha = it[3 + o];
+    g.drawImage(r.canvas, x - r.w / 2 - r.pad, base - lift - r.h - r.pad, r.w + 2 * r.pad, r.h + 2 * r.pad);
+  }
+  g.globalAlpha = 1;
+
+  // Dark foot so the skyline settles into the page edge.
+  const fade = g.createLinearGradient(0, base - 40 * u, 0, base);
+  fade.addColorStop(0, 'rgba(9,11,20,0)');
+  fade.addColorStop(1, 'rgba(9,11,20,.9)');
+  g.fillStyle = fade;
+  g.fillRect(0, base - 40 * u, w, 40 * u);
 }
 
 launchForm.addEventListener('submit', function (e) {
