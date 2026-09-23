@@ -1052,6 +1052,8 @@ const KL_ZONES = [
     extras: [{ id: 'twinTowers', x: 0.305, h: 124, a: 0.95, skip: ['mall', 'mallSign'] }], ads: false },
   { key: 'klcc',           name: 'KLCC',            sky: ['#060a16', '#0f1c30', '#1c3550'], trio: 1.0,  hero: { id: 'twinTowers', x: 0.5, h: 162, lift: 10 }, foreground: 'klcc', hideInTrio: ['twinTowers', 'ilhamTower'],
     extras: [{ id: 'ilhamTower', x: 0.74, h: 100, a: 0.95, skip: ['hatch', 'neighbour'] }], ads: false },
+  /* silent zone: scenery only, like the Ilham stretch. Jalan Ampang east of KLCC; the mall simply passes by. */
+  { key: 'ampang',         name: '',                silent: true, sky: ['#060914', '#101a2c', '#22304a'], trio: 1.0,  hero: { id: 'greatEasternMall', x: 0.5, h: 140, lift: 6 }, foreground: 'ampang', ads: false },
   { key: 'batuCaves',      name: 'BATU CAVES',      sky: ['#050b0c', '#0e1f1c', '#173a2e'], trio: 0.0,  hero: { id: 'batuCaves', x: 0.5, h: 165, lift: 8 }, foreground: 'batu', ads: false }
 ];
 
@@ -1278,6 +1280,7 @@ function drawZoneForeground(ctx, baked, zone, horizonY, drift, alpha, t) {
   else if (zone.foreground === 'batu') drawBatuForeground(ctx, baked, horizonY, drift, alpha);
   else if (zone.foreground === 'pasar') drawPasarForeground(ctx, baked, horizonY, drift, alpha);
   else if (zone.foreground === 'ilham') drawIlhamForeground(ctx, baked, horizonY, drift, alpha, t);
+  else if (zone.foreground === 'ampang') drawAmpangForeground(ctx, baked, horizonY, drift, alpha);
 }
 
 /* ============================================================
@@ -1392,6 +1395,31 @@ function drawIlhamForeground(ctx, baked, horizonY, drift, alpha, t) {
   for (let i = 0; i < xs.length; i++) drawBakedScaled(ctx, baked.tree, cx + xs[i] * k, top + bandH * 0.3, baked.tree.h * fs[i], a);
   ctx.globalAlpha = 1;
 }
+
+/* ============================================================
+   SILENT MALL ZONE FOREGROUND (Jalan Ampang)
+   Pale paved forecourt with a planted verge and a row of kerb lights, a row of royal palms in front of the glass
+   drum's lowest floors (right of the axis, as in the street view) and rain trees under the tower on the left.
+   Heights are tuned against the hero's baked geometry (h 140, lift 6) so palm crowns stay at/below the ledge
+   between the drum's two lowest lit floors - never the ribbons or rim above - and the trees stay well clear of
+   the podium's lit yellow panel (screen x roughly cx-20 to cx+10).
+   ============================================================ */
+const AMPANG_PALM_X = [26, 44, 63, 82, 100];
+const AMPANG_PALM_F = [0.68, 0.80, 0.90, 0.80, 0.68];
+const AMPANG_TREE_X = [-108, -84, -60];
+const AMPANG_TREE_F = [0.82, 1.0, 0.90];
+function drawAmpangForeground(ctx, baked, horizonY, drift, alpha) {
+  const k = baked.k, a = alpha === undefined ? 1 : alpha, cx = 180 + drift, bandH = 7 * k, top = horizonY - bandH;
+  ctx.globalAlpha = a;
+  ctx.fillStyle = '#34383f'; ctx.fillRect(0, top, 360, bandH);                                            // forecourt paving
+  ctx.fillStyle = '#4a4f58'; ctx.fillRect(0, top, 360, Math.max(0.6, 0.8 * k));                            // far paving highlight
+  ctx.fillStyle = '#16301f'; ctx.fillRect(0, horizonY - 2 * k, 360, 2 * k);                                // planted verge before the road
+  ctx.fillStyle = '#fff1cf';
+  for (let i = -6; i <= 6; i++) { if (i === 0) continue; ctx.fillRect(cx + i * 14 * k - 0.4 * k, top + 0.3 * k, 0.8 * k, 1.2 * k); }   // kerb lights, none on the road axis
+  for (let i = 0; i < AMPANG_PALM_X.length; i++) drawBakedScaled(ctx, baked.palm, cx + AMPANG_PALM_X[i] * k, top + bandH * 0.5, baked.palm.h * AMPANG_PALM_F[i], a);
+  for (let i = 0; i < AMPANG_TREE_X.length; i++) drawBakedScaled(ctx, baked.tree, cx + AMPANG_TREE_X[i] * k, top + bandH * 0.3, baked.tree.h * AMPANG_TREE_F[i], a);
+  ctx.globalAlpha = 1;
+}
 </script>
 <script>
 /* ============================================================
@@ -1429,6 +1457,7 @@ const KL_DISTRICTS = {
   ilham:          { wall: null,       pave: '#4d525e', ground: '#0f2418', groundL: null, kerb: KL_KERB_STONE, edge: null,      lamp: 'arm',      tree: 'palm', treeEvery: 8,  treeX: 2.30, treeH: 1.8, blade: null,       stalls: false, hedge: true,  fence: false, treeMaxZ: 150 },   // silent lead-in to KLCC: same boulevard, no buildings
   dataranMerdeka: { wall: null,       pave: '#5c554d', ground: '#1b241d', groundL: '#17331f', kerb: KL_KERB_STONE, edge: null,   lamp: 'heritage', tree: 'palm', treeEvery: 8,  treeX: 2.25, treeH: 1.9, blade: null,       stalls: false, hedge: false, fence: true, treeMaxZ: 150 },
   klcc:           { wall: null,       pave: '#4d525e', ground: '#0f2418', groundL: null, kerb: KL_KERB_STONE, edge: null,      lamp: 'arm',      tree: 'palm', treeEvery: 8,  treeX: 2.95, treeH: 1.8, blade: null,       stalls: false, hedge: true,  fence: false, treeMaxZ: 150 },
+  ampang:         { wall: null,       pave: '#4a4e57', ground: '#0f2418', groundL: null, kerb: KL_KERB_STONE, edge: null,      lamp: 'arm',      tree: 'palm', treeEvery: 9,  treeX: 2.40, treeH: 1.8, blade: null,       stalls: false, hedge: true,  fence: false, treeMaxZ: 150 },   // silent Jalan Ampang stretch after KLCC: boulevard, no buildings
   batuCaves:      { wall: 'shed',     pave: '#3d2b26', ground: '#0e1c14', groundL: null, kerb: KL_KERB_BW,    edge: null,      lamp: 'arm',      tree: 'tree', treeEvery: 11, treeX: 2.35, treeH: 1.9, blade: null,       stalls: false, hedge: false, fence: false, treeMaxZ: 150 },
   neutral:        { wall: null,       pave: '#30343f', ground: '#0c0e15', groundL: null, kerb: KL_KERB_BW,    edge: null,      lamp: 'arm',      tree: null,   treeEvery: 0,  treeX: 0,    treeH: 0,   blade: null,       stalls: false, hedge: false, fence: false }
 };
@@ -1565,6 +1594,7 @@ const KL_SIGNS = {
     ilham:          ['speed60', 'busStop', 'noUturn', 'straight'],
     dataranMerdeka: ['speed60', 'noUturn'],
     klcc:           ['speed60', 'busStop', 'noUturn'],
+    ampang:         ['speed60', 'busStop', 'noUturn', 'straight'],
     batuCaves:      ['speed60', 'busStop'],
     neutral:        ['speed60']
   }
@@ -3191,8 +3221,8 @@ function fixedUpdate(dt) {
     nextGateZoneIndex++;
   }
   // v0.3 (5A): plain viaduct, once per Bukit Bintang occurrence. Jumps a
-  // full loop (all 5 zones) ahead after spawning, since Bukit Bintang only
-  // recurs every KL_ZONES.length * ZONE_DIST.
+  // full loop (every zone in KL_ZONES) ahead after spawning, since Bukit
+  // Bintang only recurs every KL_ZONES.length * ZONE_DIST.
   if (distance + CONFIG.Z_SPAWN >= nextViaductDist) {
     spawnViaduct(CONFIG.Z_SPAWN, 1, 7);
     nextViaductDist += KL_ZONES.length * CONFIG.ZONE_DIST;
