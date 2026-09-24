@@ -112,7 +112,7 @@ After gameplay or rendering changes:
 3. Test both ways in: no saved name, and a saved `racerweek_player_name` (check it gets normalized). Both must dismiss the landing page and start play; only the saved one should set a tester name. If the nickname field is visible again, also test typing a name. Check the landing skyline appears after `PLAY NOW` is enabled and does not cover the copy.
 4. Run `?selftest=1` and check the expected lines above.
 5. Check the launch, PLAYING, PAUSED, DEAD and retry states.
-6. Check every district: Bukit Bintang, Jalan Petaling, Pasar Seni, Little India, Dataran Merdeka, the silent Ilham stretch, KLCC and Batu Caves. Verify each announced zone's gate and transition. Ilham intentionally has no gate, title, chime or player-facing name, so a death there must report Dataran Merdeka as the last announced zone.
+6. Check every district: Bukit Bintang, Jalan Petaling, Pasar Seni, Little India, Dataran Merdeka, the silent Ilham stretch, KLCC, the silent Jalan Ampang stretch (Great Eastern Mall) and Batu Caves. Verify each announced zone's gate and transition. The silent stretches intentionally have no gate, title, chime or player-facing name, so a death in Ilham must report Dataran Merdeka and a death in Ampang must report KLCC as the last announced zone.
 7. Check hazards and pickups at far, mid and collision distance, not only in static beauty shots.
 8. Check 360 x 780, 360 x 560 and a desktop landscape viewport.
 9. Confirm the mute target, the debug corner gesture, the debug copy fallback, resize/orientation handling and pause-on-hidden.
