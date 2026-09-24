@@ -1063,7 +1063,7 @@ const KL_ZONES = [
 /* persistent far skyline: drawn ONCE (never tiled), order = back to front */
 const KL_TRIO = [
   { id: 'exchange106', x: 0.655, h: 70,  a: 0.75 },
-  { id: 'merdeka118',  x: 0.86,  h: 150, a: 0.92 },
+  { id: 'merdeka118',  x: 0.86,  h: 168, a: 0.92 },
   { id: 'klTower',     x: 0.15,  h: 96,  a: 0.92, onHill: 22 },
   { id: 'ilhamTower',  x: 0.515, h: 72,  a: 0.92, skip: ['podium', 'hatch', 'neighbour'] },                 // 274 m, just east of the twin towers
   { id: 'twinTowers',  x: 0.40,  h: 108, a: 0.97, skip: ['mall', 'mallSign'] }   // from afar the mall is hidden by the city
@@ -2543,13 +2543,13 @@ try { playerNameInput.value = localStorage.getItem('racerweek_player_name') || '
    Wide screens keep the copy column clear: x is a fraction of the side gutter, measured
    from the left edge (L) or the right edge (R); C sits centred below the copy. Order = back to front. */
 const LANDING_SKYLINE_NARROW = [
-  ['exchange106', 0.58, 70, 0.55], ['sentralTowers', 0.74, 64, 0.8], ['merdeka118', 0.88, 150, 0.8],
+  ['exchange106', 0.58, 70, 0.55], ['sentralTowers', 0.74, 64, 0.8], ['merdeka118', 0.88, 168, 0.8],
   ['hill', 0.10, 22, 1], ['klTower', 0.10, 96, 0.9],
   ['ilhamTower', 0.62, 90, 0.9, ['podium', 'hatch', 'neighbour']], ['twinTowers', 0.40, 150, 1],
   ['greatEasternMall', 0.66, 42, 1], ['sultanAbdulSamad', 0.19, 42, 1], ['batuCaves', 0.95, 44, 0.9]
 ];
 const LANDING_SKYLINE_WIDE = [
-  ['exchange106', 'R', 0.58, 70, 0.55], ['sentralTowers', 'R', 0.80, 64, 0.8], ['merdeka118', 'R', 0.36, 150, 0.8],
+  ['exchange106', 'R', 0.58, 70, 0.55], ['sentralTowers', 'R', 0.80, 64, 0.8], ['merdeka118', 'R', 0.36, 168, 0.8],
   ['hill', 'L', 0.14, 22, 1], ['klTower', 'L', 0.14, 96, 0.9],
   ['ilhamTower', 'L', 0.70, 90, 0.9, ['podium', 'hatch', 'neighbour']], ['twinTowers', 'L', 0.44, 150, 1],
   ['greatEasternMall', 'L', 0.84, 42, 1],
