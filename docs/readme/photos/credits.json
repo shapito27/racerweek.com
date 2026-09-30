@@ -1,0 +1,109 @@
+{
+  "twinTowers": {
+    "file": "File:Petronas Twin Towers at night in KL.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Petronas_Twin_Towers_at_night_in_KL.JPG",
+    "author": "Jordiferrer",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "night": true
+  },
+  "klTower": {
+    "file": "File:Malaysia - 066 - KL - KL Tower (3528921394).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Malaysia_-_066_-_KL_-_KL_Tower_(3528921394).jpg",
+    "author": "McKay Savage from London, UK",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "night": true
+  },
+  "merdeka118": {
+    "file": "File:Merdeka 118 at night (November 2025).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Merdeka_118_at_night_(November_2025).jpg",
+    "author": "Tyroleanguy",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "night": true
+  },
+  "exchange106": {
+    "file": "File:The Exchange 106 skyline Nov of 2021.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:The_Exchange_106_skyline_Nov_of_2021.jpg",
+    "author": "LegendaryLim",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "night": false
+  },
+  "sultanAbdulSamad": {
+    "file": null,
+    "page": null,
+    "author": null,
+    "license": null,
+    "licenseUrl": null,
+    "night": null,
+    "note": "owner-supplied reference photo; source and licence still to be confirmed"
+  },
+  "batuCaves": {
+    "file": "File:Murugan statue, Batu Caves (220714) 02.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Murugan_statue,_Batu_Caves_(220714)_02.jpg",
+    "author": "*angys*",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "night": false
+  },
+  "centralMarket": {
+    "file": "File:Central Market 6 June 2014.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Central_Market_6_June_2014.JPG",
+    "author": "Bearsmalaysia",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "night": false
+  },
+  "kasturiGate": {
+    "file": "File:Kasturi Walk, KL (7904758618).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Kasturi_Walk,_KL_(7904758618).jpg",
+    "author": "shankar s. from Dubai, united arab emirates",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "night": true
+  },
+  "ilhamTower": {
+    "file": "File:Ilham tower.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Ilham_tower.jpg",
+    "author": "rucksalziga",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "night": false
+  },
+  "greatEasternMall": {
+    "file": null,
+    "page": null,
+    "author": null,
+    "license": null,
+    "licenseUrl": null,
+    "night": false,
+    "note": "owner-supplied reference photo; source and licence still to be confirmed"
+  },
+  "petalingGate": {
+    "file": "File:Jalan Petaling 2024.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Jalan_Petaling_2024.jpg",
+    "author": "ほっきー",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "night": false
+  },
+  "monorailStation": {
+    "file": "File:Bukit Bintang Monorail Station outview (211030).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Bukit_Bintang_Monorail_Station_outview_(211030).jpg",
+    "author": "*angys*",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "night": false
+  },
+  "littleIndiaGate": {
+    "file": null,
+    "page": null,
+    "author": null,
+    "license": null,
+    "licenseUrl": null,
+    "night": false,
+    "note": "owner-supplied reference photo; source and licence still to be confirmed"
+  }
+}

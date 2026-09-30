@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Racerweek is a self-contained mobile browser game: a three-lane endless dodger set across stylized Kuala Lumpur districts. `index.html` is the canonical source. It contains both the crawlable launch page and the expanded v0.4.5 Kuala Lumpur game. There is no package manager, framework, build step or runtime asset loading. Production minification is a release step only, so always edit the readable source, not the generated file.
 
-`greybox-A-lanes.md` is the original prototype contract. It remains the source for the core loop, input, collision, scoring, determinism, metrics and mobile-browser constraints. `README-greybox-pack.md` explains the playtest experiment and the path from greybox to KL art.
+`greybox-A-lanes.md` is the original prototype contract. It remains the source for the core loop, input, collision, scoring, determinism, metrics and mobile-browser constraints.
 
 The reference images live in `assets-archive/` (for example `unnamed (2).jpg` for the target look, and `kl-signs-sheet.png` / `kl-signs-in-street.png` for signage) and in `twintower/`. They are references only: the game draws everything with inline Canvas 2D code and must not depend on image files. `arhive/index.html` is the version from before the route was expanded; do not edit it.
 
@@ -23,7 +23,7 @@ There is no lint or test runner. The tests are the page's own self-tests: load `
 - `rows=5000 fairness violations=0` (this must be 0)
 - `klsFlagSelfTest: OK (0 violations)`
 - `kopitiamChinese.usedFallback` / `bananaLeafTamil.usedFallback`: whether the device has fonts for the non-Latin boards
-- `kapcaiKeyFor shares`, which should be close to 20/12/8/20/20/20 for `kapcai`, `kapcaiPlain`, `kapcaiPillion`, `kapcaiJade`, `kapcaiMagenta`, `kapcaiMelon`
+- `kapcaiKeyFor shares`, which should be close to 20/20/20/20/20 for `kapcai`, `kapcaiPlain`, `kapcaiJade`, `kapcaiMagenta`, `kapcaiMelon`
 
 Query parameters:
 

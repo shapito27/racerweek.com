@@ -1552,8 +1552,8 @@ function buildKLStreetAssets(makeCanvas, bake) {
    Non-Latin strings are written as \u escapes on purpose - they survive copy / paste through any tool unchanged.
      \u5496\u5561\u5E97                          = Chinese for kopitiam, literally "coffee shop" (ka fei dian)
      \u0BB5\u0BBE\u0BB4\u0BC8 \u0B87\u0BB2\u0BC8   = Tamil for "banana leaf" (vaazhai ilai)
-   Each of those two appears exactly ONCE per pass through the Jalan Petaling district (KL_STREET.ZONE_LEN must equal the
-   game's zone length). Every other board is Malay / English.
+   The Chinese board appears exactly ONCE per pass through Jalan Petaling and the Tamil board once per pass through
+   Little India (KL_STREET.ZONE_LEN must equal the game's zone length). Every other board is Malay / English.
    Road signs follow the Malaysian conventions in the owner's reference sheets: blue = ordinary roads, green = expressways,
    maroon = tourist places, yellow hexagon = route shield, orange = temporary roadworks signs with Malay wording.
    ============================================================ */
@@ -2985,8 +2985,8 @@ function runSelfTest() {
     console.log('[selftest] bananaLeafTamil.usedFallback=' + (o.bananaLeafTamil && o.bananaLeafTamil.usedFallback));
   }
 
-  // v0.4.1: kapcai livery distribution - target 20/12/8/20/20/20 (percent)
-  // for kapcai/kapcaiPlain/kapcaiPillion/kapcaiJade/kapcaiMagenta/kapcaiMelon.
+  // v0.4.1: kapcai livery distribution - target 20/20/20/20/20 (percent)
+  // for kapcai/kapcaiPlain/kapcaiJade/kapcaiMagenta/kapcaiMelon.
   const counts = {};
   const N = 2000;
   for (let i = 0; i < N; i++) {
@@ -4158,19 +4158,17 @@ function drawCarSprite(g, w, h, bodyColor, glassColor, opts) {
 }
 
 /* ---------------------- kapcai liveries ------------------------------
-   Street-livery presets for the delivery rider. No marks, no wordmarks,
-   no logos anywhere - and the hues are deliberately nudged off the real
-   services' exact brand values while still reading as that kind of rider
-   on a KL street. Pass any hex you like via opts.colors to override.   */
-// v0.4.1: the earlier "read as real delivery brands" note (v0.4 fix #7)
-// is withdrawn - it was advice, not a change request, and the owner has
-// decided these four liveries stay exactly as originally designed. Not
-// re-colouring this again for any reason, brand-safety included.
+   Generic delivery-rider liveries: plain colour blocks, no wordmarks and
+   no brand marks. The colours are an owner decision. Pass any hex you
+   like via opts.colors to override.                                     */
+// v0.4.6: at the owner's request, jade now has a green helmet over a plain black jacket.
+// v0.4.6: at the owner's request, magenta has a matching helmet, a grey jacket and a simple cat face (not a brand mark) on the box.
+// v0.4.6: at the owner's request, melon has black sleeves and a flat side-view sitting cat (not a brand mark) on the box.
 const KAPCAI_LIVERY = {
   slate:   { box: '#3d4a5f', trim: '#e8f1ff', vest: null,      helmet: '#e8f1ff', bike: '#2e6cff' },  // generic
-  jade:    { box: '#0f9e5c', trim: '#eafff4', vest: '#0f9e5c', helmet: '#f2fff8', bike: '#1d2530' },  // green delivery rider
-  magenta: { box: '#c9256e', trim: '#ffe9f3', vest: '#c9256e', helmet: '#f7eaf2', bike: '#1d2530' },  // pink delivery rider
-  melon:   { box: '#e8722c', trim: '#fff2e6', vest: '#e8722c', helmet: '#eef2f8', bike: '#1d2530' }   // orange delivery rider
+  jade:    { box: '#0f9e5c', trim: '#eafff4', vest: null,      helmet: '#0f9e5c', bike: '#1d2530', jacket: '#15171b' },  // green delivery rider: green helmet and box, plain black jacket (no vest)
+  magenta: { box: '#c9256e', trim: '#ffe9f3', vest: null,      helmet: '#c9256e', bike: '#1d2530', jacket: '#9ea0a5', cat: true },  // pink delivery rider: helmet matches the box, grey jacket (no vest), cat face on the box
+  melon:   { box: '#e8722c', trim: '#fff2e6', vest: '#e8722c', helmet: '#eef2f8', bike: '#1d2530', sleeves: '#0a0b0e', catSit: true }   // orange delivery rider: black sleeves, sitting cat on the box
 };
 
 /* ------------------------------ kapcai ------------------------------- */
@@ -4184,7 +4182,7 @@ function drawKapcaiSprite(g, w, h, bodyColor, riderColor, opts) {
   const L = Object.assign({}, KAPCAI_LIVERY[opts.livery] || KAPCAI_LIVERY.slate, opts.colors || {});
   const box = opts.box !== false;
   const bike = L.bike || bodyColor;
-  const jacket0 = riderColor || '#242a36';
+  const jacket0 = L.jacket || riderColor || '#242a36';
   const helmetColor = opts.helmet || L.helmet || '#e8f1ff';
   const cx = w * 0.5;
 
@@ -4309,7 +4307,7 @@ function drawKapcaiSprite(g, w, h, bodyColor, riderColor, opts) {
   g.fillRect(cx - w * 0.308, h * 0.312, w * 0.616, Math.max(1, h * 0.010));
 
   /* arms sweeping out to the grips */
-  g.fillStyle = shade(jacket0, 0.34);
+  g.fillStyle = L.sleeves || shade(jacket0, 0.34);
   [-1, 1].forEach(function (s) {
     g.beginPath();
     g.moveTo(cx + s * w * 0.282, h * 0.256);
@@ -4358,126 +4356,6 @@ function drawKapcaiSprite(g, w, h, bodyColor, riderColor, opts) {
   g.fillStyle = rgba('#8a93a6', 0.12);
   g.fillRect(cx - w * 0.206, h * 0.556, w * 0.412, Math.max(1, h * 0.012));
 
-  /* ---- pillion kid, sitting nearer the camera than the rider ----
-     The kid is BEHIND the rider in the world, which from a chase cam
-     means NEARER us: the small helmet overlaps the rider's back at
-     shoulder-blade height and the kid's body covers his lower back.
-     Leaning out to one side, because they always are. */
-  if (opts.pillion) {
-    const P = opts.pillionColors || {};
-    const kJacket = P.jacket || '#4f7bb5';
-    const kHelm = P.helmet || '#e4ebf6';
-    const kBand = P.band || '#3a5c93';
-    const kx = cx - w * 0.048;
-    const kHW = w * 0.146;
-
-    /* occlusion shadow cast onto the rider - sells the depth gap */
-    softEllipse(g, kx, h * 0.480, w * 0.300, h * 0.140, '#000000', 0.55);
-
-    /* knees and dangling feet, outboard of the torso, over his boots */
-    [-1, 1].forEach(function (s) {
-      const lx = kx + s * w * 0.214;
-      g.fillStyle = linGrad(g, lx - w * 0.052, 0, lx + w * 0.052, 0, [
-        [0.00, '#2a3850'], [0.42, '#4f6c92'], [1.00, '#1f2a3c']
-      ]);
-      drawRoundedRect(g, lx - w * 0.052, h * 0.514, w * 0.104, h * 0.100, w * 0.034); g.fill();
-      g.fillStyle = rgba('#000000', 0.30);
-      g.fillRect(lx - w * 0.052, h * 0.574, w * 0.104, Math.max(1, h * 0.010));
-      g.fillStyle = '#12171f';
-      drawRoundedRect(g, lx - w * 0.054, h * 0.600, w * 0.108, h * 0.048, w * 0.018); g.fill();
-      g.fillStyle = rgba('#e8f1ff', 0.42);
-      g.fillRect(lx - w * 0.050, h * 0.634, w * 0.100, Math.max(1, h * 0.012));
-    });
-
-    /* upper arms reaching forward round the rider's waist. Thin, angled
-       down, and cut off at his flank - the forearms are out of sight. */
-    [-1, 1].forEach(function (s) {
-      g.fillStyle = shade(kJacket, 0.40);
-      g.beginPath();
-      g.moveTo(kx + s * w * 0.118, h * 0.470);
-      g.quadraticCurveTo(kx + s * w * 0.210, h * 0.484, kx + s * w * 0.248, h * 0.520);
-      g.lineTo(kx + s * w * 0.224, h * 0.546);
-      g.quadraticCurveTo(kx + s * w * 0.172, h * 0.512, kx + s * w * 0.104, h * 0.506);
-      g.closePath(); g.fill();
-      g.fillStyle = rgba('#000000', 0.25);
-      g.beginPath();
-      g.moveTo(kx + s * w * 0.208, h * 0.486);
-      g.quadraticCurveTo(kx + s * w * 0.232, h * 0.504, kx + s * w * 0.230, h * 0.540);
-      g.lineTo(kx + s * w * 0.212, h * 0.532);
-      g.closePath(); g.fill();
-    });
-
-    /* torso: sloped shoulders, soft taper, no hard box edges */
-    g.fillStyle = linGrad(g, kx - kHW, 0, kx + kHW, 0, [
-      [0.00, shade(kJacket, 0.58)], [0.28, tint(kJacket, 0.18)],
-      [0.62, shade(kJacket, 0.16)], [1.00, shade(kJacket, 0.62)]
-    ]);
-    g.beginPath();
-    g.moveTo(kx - kHW * 0.52, h * 0.442);
-    g.quadraticCurveTo(kx - kHW * 1.02, h * 0.468, kx - kHW * 1.00, h * 0.552);
-    g.quadraticCurveTo(kx - kHW * 0.98, h * 0.600, kx - kHW * 0.86, h * 0.606);
-    g.lineTo(kx + kHW * 0.86, h * 0.606);
-    g.quadraticCurveTo(kx + kHW * 0.98, h * 0.600, kx + kHW * 1.00, h * 0.552);
-    g.quadraticCurveTo(kx + kHW * 1.02, h * 0.468, kx + kHW * 0.52, h * 0.442);
-    g.closePath(); g.fill();
-    /* collar, zip, hem */
-    g.fillStyle = rgba('#000000', 0.40);
-    drawRoundedRect(g, kx - kHW * 0.50, h * 0.436, kHW * 1.00, h * 0.026, w * 0.016); g.fill();
-    g.strokeStyle = rgba('#000000', 0.32);
-    g.lineWidth = Math.max(1, w * 0.008);
-    g.beginPath(); g.moveTo(kx, h * 0.462); g.lineTo(kx, h * 0.598); g.stroke();
-    g.fillStyle = rgba('#000000', 0.28);
-    g.fillRect(kx - kHW * 0.90, h * 0.582, kHW * 1.80, Math.max(1, h * 0.014));
-    g.fillStyle = rgba('#e8f1ff', 0.26);
-    g.fillRect(kx - kHW * 0.84, h * 0.498, kHW * 1.68, Math.max(1, h * 0.012));
-    if (opts.backpack) {
-      g.fillStyle = linGrad(g, kx - kHW * 0.62, 0, kx + kHW * 0.62, 0, [
-        [0.00, '#1f5a66'], [0.34, '#3f8b99'], [1.00, '#17454f']
-      ]);
-      drawRoundedRect(g, kx - kHW * 0.62, h * 0.482, kHW * 1.24, h * 0.086, w * 0.030); g.fill();
-      g.fillStyle = rgba('#ffffff', 0.18);
-      g.fillRect(kx - kHW * 0.52, h * 0.496, kHW * 1.04, Math.max(1, h * 0.010));
-    }
-
-    /* helmet: smaller shell, dark rear band, chin strap down both sides */
-    const khr = w * 0.140, khy = h * 0.378;
-    g.fillStyle = '#0a0e15';
-    drawRoundedRect(g, kx - khr * 0.62, khy + khr * 0.70, khr * 1.24, khr * 0.80, khr * 0.30);
-    g.fill();
-    g.save();
-    g.beginPath(); g.ellipse(kx, khy, khr, khr * 1.08, 0, 0, TAU); g.clip();
-    const kg = g.createRadialGradient(kx - khr * 0.42, khy - khr * 0.52, khr * 0.08, kx, khy, khr * 1.30);
-    kg.addColorStop(0.00, tint(kHelm, 0.55));
-    kg.addColorStop(0.50, kHelm);
-    kg.addColorStop(1.00, shade(kHelm, 0.62));
-    g.fillStyle = kg; g.fillRect(kx - khr, khy - khr * 1.2, khr * 2, khr * 2.4);
-    g.fillStyle = rgba(kBand, 0.95);
-    g.fillRect(kx - khr, khy - khr * 0.14, khr * 2, khr * 0.20);
-    g.fillStyle = rgba('#000000', 0.50);
-    g.fillRect(kx - khr, khy + khr * 0.84, khr * 2, khr * 0.5);
-    g.restore();
-    /* rim light round the crown so the shell reads as a sphere */
-    g.save();
-    g.globalCompositeOperation = 'lighter';
-    g.strokeStyle = rgba('#ffffff', 0.35);
-    g.lineWidth = Math.max(1, w * 0.012);
-    g.beginPath();
-    g.ellipse(kx, khy, khr * 0.86, khr * 0.94, 0, Math.PI * 1.05, Math.PI * 1.85);
-    g.stroke();
-    g.restore();
-    g.strokeStyle = rgba('#05070b', 0.85);
-    g.lineWidth = Math.max(1.2, w * 0.018);
-    g.beginPath(); g.ellipse(kx, khy, khr * 1.02, khr * 1.10, 0, 0, TAU); g.stroke();
-    [-1, 1].forEach(function (s) {          // chin strap
-      g.strokeStyle = rgba('#dfe9fb', 0.30);
-      g.lineWidth = Math.max(1, w * 0.009);
-      g.beginPath();
-      g.moveTo(kx + s * khr * 0.80, khy + khr * 0.42);
-      g.lineTo(kx + s * khr * 0.52, khy + khr * 1.12);
-      g.stroke();
-    });
-  }
-
   /* ---- delivery box, drawn over the rider's lower back ---- */
   if (box) {
     const bhw = w * 0.256, by = h * 0.412, bh2 = h * 0.228;
@@ -4502,16 +4380,51 @@ function drawKapcaiSprite(g, w, h, bodyColor, riderColor, opts) {
     g.lineWidth = Math.max(1, w * 0.010);
     drawRoundedRect(g, cx - bhw, by, bhw * 2, bh2, w * 0.030); g.stroke();
     g.fillStyle = rgba(L.trim, 0.85);
-    g.fillRect(cx - bhw * 0.90, by + bh2 * 0.30, bhw * 1.80, Math.max(1, bh2 * 0.055));
+    if (!L.catSit) g.fillRect(cx - bhw * 0.90, by + bh2 * 0.30, bhw * 1.80, Math.max(1, bh2 * 0.055));   // the sitting cat takes the upper tape's place
     g.fillStyle = rgba('#e8f1ff', 0.55);
     g.fillRect(cx - bhw * 0.90, by + bh2 * 0.70, bhw * 1.80, Math.max(1, bh2 * 0.085));
-    g.strokeStyle = rgba('#000000', 0.35);
-    g.lineWidth = Math.max(1, w * 0.008);
-    g.beginPath();
-    g.moveTo(cx, by + bh2 * 0.10); g.lineTo(cx, by + bh2 * 0.92);
-    g.stroke();
-    g.fillStyle = '#1b2230';
-    drawRoundedRect(g, cx - w * 0.026, by + bh2 * 0.42, w * 0.052, bh2 * 0.16, w * 0.010); g.fill();
+    if (L.cat) {                             // cat face between the tapes, in place of the seam and latch
+      const cy = by + bh2 * 0.52, r = bh2 * 0.15;
+      g.fillStyle = L.trim;
+      g.beginPath();
+      g.moveTo(cx - r * 0.95, cy - r * 0.35); g.lineTo(cx - r * 0.80, cy - r * 1.35); g.lineTo(cx - r * 0.20, cy - r * 0.85);
+      g.moveTo(cx + r * 0.95, cy - r * 0.35); g.lineTo(cx + r * 0.80, cy - r * 1.35); g.lineTo(cx + r * 0.20, cy - r * 0.85);
+      g.fill();
+      g.beginPath(); g.ellipse(cx, cy, r * 1.05, r * 0.90, 0, 0, TAU); g.fill();
+      g.fillStyle = shade(L.box, 0.30);
+      g.beginPath();
+      g.ellipse(cx - r * 0.40, cy - r * 0.10, r * 0.15, r * 0.22, 0, 0, TAU);
+      g.moveTo(cx + r * 0.55, cy - r * 0.10);
+      g.ellipse(cx + r * 0.40, cy - r * 0.10, r * 0.15, r * 0.22, 0, 0, TAU);
+      g.fill();
+      g.beginPath();
+      g.moveTo(cx - r * 0.14, cy + r * 0.22); g.lineTo(cx + r * 0.14, cy + r * 0.22); g.lineTo(cx, cy + r * 0.38);
+      g.closePath(); g.fill();
+    } else if (L.catSit) {                   // whole cat sitting, seen from the side (facing right), between the tapes
+      const u = bh2 * 0.52, yb = by + bh2 * 0.672, x0 = cx - u * 0.04;
+      g.fillStyle = L.trim;
+      g.beginPath(); g.ellipse(x0 - u * 0.06, yb - u * 0.30, u * 0.25, u * 0.30, 0, 0, TAU); g.fill();   // body
+      g.fillRect(x0 - u * 0.24, yb - u * 0.10, u * 0.48, u * 0.10);                                     // flat seat + front paws
+      g.beginPath(); g.arc(x0 + u * 0.12, yb - u * 0.70, u * 0.19, 0, TAU); g.fill();                    // head
+      g.beginPath();
+      g.moveTo(x0 - u * 0.01, yb - u * 0.80); g.lineTo(x0 + u * 0.02, yb - u * 1.02); g.lineTo(x0 + u * 0.12, yb - u * 0.88);
+      g.moveTo(x0 + u * 0.14, yb - u * 0.89); g.lineTo(x0 + u * 0.25, yb - u * 1.02); g.lineTo(x0 + u * 0.29, yb - u * 0.78);
+      g.fill();                                                                                         // ears
+      g.beginPath(); g.moveTo(x0 + u * 0.10, yb - u * 0.52); g.quadraticCurveTo(x0 + u * 0.22, yb - u * 0.40, x0 + u * 0.14, yb - u * 0.12);
+      g.lineTo(x0 + u * 0.02, yb - u * 0.30); g.closePath(); g.fill();                                   // chest to front legs
+      g.strokeStyle = L.trim; g.lineWidth = Math.max(1, u * 0.10); g.lineCap = 'round';
+      g.beginPath(); g.moveTo(x0 - u * 0.24, yb - u * 0.06);
+      g.quadraticCurveTo(x0 - u * 0.58, yb - u * 0.02, x0 - u * 0.50, yb - u * 0.42); g.stroke();       // tail curling up behind
+      g.lineCap = 'butt';
+    } else {
+      g.strokeStyle = rgba('#000000', 0.35);
+      g.lineWidth = Math.max(1, w * 0.008);
+      g.beginPath();
+      g.moveTo(cx, by + bh2 * 0.10); g.lineTo(cx, by + bh2 * 0.92);
+      g.stroke();
+      g.fillStyle = '#1b2230';
+      drawRoundedRect(g, cx - w * 0.026, by + bh2 * 0.42, w * 0.052, bh2 * 0.16, w * 0.010); g.fill();
+    }
     /* strap over the top face */
     g.fillStyle = rgba('#0d1219', 0.75);
     g.fillRect(cx - bhw * 0.14, h * 0.374, bhw * 0.28, by - h * 0.374);
@@ -5273,7 +5186,6 @@ function drawBillboard(visualKey, xLane, z, alpha) {
 const KAPCAI_KEYS = {
   kapcai:        { livery: 'slate',   box: true  },   // generic, with a case
   kapcaiPlain:   { livery: 'slate',   box: false },   // generic, no case
-  kapcaiPillion: { livery: 'slate',   box: false, pillion: true },  // kid on the back
   kapcaiJade:    { livery: 'jade',    box: true  },
   kapcaiMelon:   { livery: 'melon',   box: true  },
   kapcaiMagenta: { livery: 'magenta', box: true  }
@@ -5287,7 +5199,7 @@ function registerKapcaiLiveries() {
     const cfg = KAPCAI_KEYS[key];
     makeSprite(key, function (g, w, h) {
       drawKapcaiSprite(g, w, h, null, '#242a36',
-                       { livery: cfg.livery, box: cfg.box, pillion: cfg.pillion });
+                       { livery: cfg.livery, box: cfg.box });
     });
   });
 }
@@ -5295,8 +5207,8 @@ function registerKapcaiLiveries() {
 // position via the existing non-gameplay hash (propHash) - not Math.random(),
 // so the same seed shows the same livery on the same obstacle on every
 // device, and this never touches the seeded gameplay RNG. Weights: generic
-// 40% (20% case / 12% plain / 8% pillion), each delivery livery 20%.
-const KAPCAI_PICK = [['kapcai', 0.20], ['kapcaiPlain', 0.32], ['kapcaiPillion', 0.40], ['kapcaiJade', 0.60], ['kapcaiMagenta', 0.80], ['kapcaiMelon', 1.00]];
+// 40% (20% case / 20% plain), each delivery livery 20%. The pillion variant was removed at the owner's request.
+const KAPCAI_PICK = [['kapcai', 0.20], ['kapcaiPlain', 0.40], ['kapcaiJade', 0.60], ['kapcaiMagenta', 0.80], ['kapcaiMelon', 1.00]];
 function kapcaiKeyFor(worldZ, lane) {
   const h = propHash(Math.floor(worldZ) * 3 + (lane + 1) * 17 + 5);
   for (let i = 0; i < KAPCAI_PICK.length; i++) if (h < KAPCAI_PICK[i][1]) return KAPCAI_PICK[i][0];
