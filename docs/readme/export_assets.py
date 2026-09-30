@@ -120,6 +120,18 @@ def export_tiles(browser, url):
             drawBaked(g, r, T / 2, beamY);
             const train = bakeLandmark('monorailTrain', 58, { bake: 2 }, R.mk);
             drawBaked(g, train, T / 2 + 40, beamY + 10);
+          } else if (id === 'sultanAbdulSamad') {
+            // framed like the Dataran Merdeka photo: KL Tower small behind, lawn and royal palms in front
+            const lawnTop = T - 150;
+            const tower = bakeLandmark('klTower', 250, { bake: 2 }, R.mk);
+            drawBaked(g, tower, T / 2 - 70, lawnTop - 20, 0.8);
+            drawBaked(g, r, T / 2, lawnTop + 4);
+            const lawn = g.createLinearGradient(0, lawnTop, 0, T);
+            lawn.addColorStop(0, '#1d4428'); lawn.addColorStop(1, '#0d2415');
+            g.fillStyle = lawn; g.fillRect(0, lawnTop, T, T - lawnTop);
+            g.fillStyle = 'rgba(255,210,140,0.16)'; g.fillRect(0, lawnTop, T, 2);
+            const palm = bakeLandmark('royalPalm', 150, { bake: 2 }, R.mk);
+            [38, 128, 214, 426, 512, 602].forEach(x => drawBaked(g, palm, x, lawnTop + 26));
           } else {
             drawBaked(g, r, T / 2, floorY + 4);
           }

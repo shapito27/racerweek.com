@@ -182,6 +182,19 @@ Every district has its own street: its own shopfronts, lamps, trees, pavement an
 
 </div>
 
+## Want to add a landmark?
+
+Contributions are welcome, especially new KL landmarks and streets. The whole game is one file, `index.html`, with no build step. Open it in a browser and you're running it.
+
+- Every landmark is a shape in `KL_LANDMARKS` near the top of `index.html`, drawn from street photos of the real place. Copy an existing entry and start from there.
+- Load `index.html?selftest=1` and check the `[selftest]` lines in the console before you send a change.
+- Run `python3 docs/readme/export_assets.py` to refresh the pictures in this README.
+- Open an issue first if you're planning something big, then send a pull request.
+
+## License
+
+The code and game art are under the [MIT License](LICENSE). You're free to use, change and share them, as long as you keep the copyright notice crediting the author. The real-world photos in this README are not covered; they belong to their authors under the licences credited next to each one.
+
 ---
 
 <sub>Real-world photos belong to their authors. Photos from Wikimedia Commons are credited beneath each one with their licence. The game art is original.</sub>
