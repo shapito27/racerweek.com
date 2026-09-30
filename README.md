@@ -64,7 +64,7 @@ Every building in the game is drawn in code, line by line, from street photos of
 <td align="center" width="50%"><img src="docs/readme/img/landmark-centralMarket.png" width="300" alt="Central Market in Racerweek"><br><sub>In the game</sub></td>
 <td align="center" width="50%"><img src="docs/readme/photos/centralMarket.jpg" width="300" alt="Central Market, real photo"><br><sub>Photo: <a href="https://commons.wikimedia.org/wiki/File:Central_Market_6_June_2014.JPG">Bearsmalaysia</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a></sub></td>
 </tr>
-<tr><td colspan="2" align="center"><b>Jalan Petaling Gate</b> · <sub>Chinatown · green tiled roof and red lanterns, you drive right under it</sub></td></tr>
+<tr><td colspan="2" align="center"><b>Jalan Petaling Gate</b> · <sub>Chinatown · gold-tiled roofs, stone lions and red lanterns, you drive right under it</sub></td></tr>
 <tr>
 <td align="center" width="50%"><img src="docs/readme/img/landmark-petalingGate.png" width="300" alt="Jalan Petaling Gate in Racerweek"><br><sub>In the game</sub></td>
 <td align="center" width="50%"><img src="docs/readme/photos/petalingGate.jpg" width="300" alt="Jalan Petaling Gate, real photo"><br><sub>Photo: <a href="https://commons.wikimedia.org/wiki/File:Jalan_Petaling_2024.jpg">ほっきー</a>, <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a></sub></td>
