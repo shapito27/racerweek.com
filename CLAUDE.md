@@ -101,7 +101,7 @@ Important data and rendering systems:
 - Do not duplicate landmark drawings. `KL_LANDMARKS` is the single source of truth for a place wherever it appears.
 - `KL_STREET.ZONE_LEN` must keep matching the final `CONFIG.ZONE_DIST`, including URL overrides.
 - Changing visual size must not silently change collision size. Presentation and the forgiving gameplay hitbox are deliberately separate.
-- Preserve user changes in this folder. It is a local Git repo with no remote, and the reference material is untracked, so do not rely on Git alone for recovery. `master` is the only branch. `.wrangler/` is ignored.
+- Preserve user changes in this folder. The repo is pushed to the public GitHub remote `origin` (`git@github.com:shapito27/racerweek.com.git`) on branch `main`, but the reference material is untracked and exists only locally, so do not rely on Git alone for recovery. Everything committed is public: never commit secrets, `.dev.vars`, personal or work email addresses, or local paths. Commits use the repo-local identity `shapito27 <legionerust@yandex.ru>`. `.wrangler/` is ignored.
 
 ## Verification
 
