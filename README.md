@@ -174,7 +174,7 @@ Every district has its own street: its own shopfronts, lamps, trees, pavement an
 
 - Runs on phones and computers, in any modern browser.
 - The whole game is a single web page, drawn in real time.
-- No account, no tracking cookies, no pop-ups.
+- No account, no ads, no pop-ups. I use Google Analytics on the live site to see how the game is played and make it better.
 
 <div align="center">
 

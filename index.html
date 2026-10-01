@@ -2580,6 +2580,26 @@ function sendRemoteLog() {
   } catch (e) {}
 }
 
+// Analytics (Google Analytics 4). The only third-party request the page
+// makes. It is production-only (or `?ga=1` for a local check) and the script
+// is injected from runNextBootTask() once the bakes finish, so it never
+// competes with boot. Events queued before that are flushed when it loads.
+const GA_ID = 'G-HYDTNSC5HS';
+const gaEnabled = location.hostname === 'racerweek.com' || params.has('ga');
+window.dataLayer = window.dataLayer || [];
+function gtag() { if (gaEnabled) window.dataLayer.push(arguments); }
+function loadAnalytics() {
+  if (!gaEnabled) return;
+  try {
+    gtag('js', new Date());
+    gtag('config', GA_ID);
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(s);
+  } catch (e) {}
+}
+
 /* ============================================================
    RESIZE
    ============================================================ */
@@ -3094,6 +3114,7 @@ function beginRun(isFirst) {
   state = 'PLAYING';
   accumulator = 0;
   lastFrameTs = null;
+  gtag('event', 'game_start', { run_number: runCount });
 }
 
 function spawnPopup(x, y, text, color) {
@@ -3149,6 +3170,10 @@ function triggerDeath(cause) {
   if (navigator.vibrate) { try { navigator.vibrate(80); } catch (e) {} }
   persistSession();
   sendRemoteLog();
+  gtag('event', 'game_over', {
+    score: finalScore, cause: cause, duration_s: currentRun.durationS, run_number: runCount,
+    zone: lastAnnouncedZoneIndex >= 0 ? zoneAtIndex(lastAnnouncedZoneIndex).name : 'none'
+  });
 }
 
 function updatePlayerTween() {
@@ -5919,6 +5944,7 @@ function runNextBootTask() {
     playButton.disabled = false;
     playButton.textContent = 'PLAY NOW';
     renderLandingArt();
+    loadAnalytics();
     if (params.has('selftest')) runSelfTest();
     return;
   }

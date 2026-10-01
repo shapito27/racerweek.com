@@ -34,6 +34,7 @@ Query parameters:
 - `?t=name` records a tester name in the session metrics.
 - `?log=<url>` sends the whole session JSON with `sendBeacon` after every death and on `pagehide` (`sendRemoteLog`). Without it, session metrics stay only in `localStorage`.
 - `?QUALITY=low` or `?QUALITY=high` forces a presentation-quality profile. It never affects gameplay or the RNG.
+- `?ga=1` enables Google Analytics off the production host, for a local check. Do not leave it on during automated runs; it sends real hits.
 - Any `CONFIG` key can be overridden, for example `?SPEED_START=30&ROW_GAP_T_START=1.4`. `?HITBOX_X=0` disables collisions, for observation-only runs.
 
 For visual checks, test at least 360 x 780 (a tall phone), 360 x 560 (the shortest supported portrait ratio) and 1280 x 720 (desktop letterboxing and keyboard play).
@@ -88,7 +89,7 @@ Important data and rendering systems:
 
 - Keep the one-file, vanilla ES2019, Canvas 2D implementation unless the user explicitly changes the delivery format.
 - The landing art is limited to the gradient, stars and the baked `KL_LANDMARKS` skyline: no image files, no car, no road. Ask before adding other artwork. Its headline, description, form label and district list must stay real HTML for crawlability and accessibility.
-- Do not add libraries, web fonts, network requests, runtime image dependencies, service workers, fullscreen calls or orientation locks.
+- Do not add libraries, web fonts, network requests, runtime image dependencies, service workers, fullscreen calls or orientation locks. The one approved exception is Google Analytics 4 (`GA_ID`, `loadAnalytics`, `gtag`): it runs only on `racerweek.com` (or with `?ga=1`), and the script is injected after the boot bakes finish, never from `<head>`. It sends `game_start` from `beginRun` and `game_over` (score, cause, duration, run number, last announced zone) from `triggerDeath`. Keep `gtag` calls out of the per-frame update and render paths, and the game must keep working when the script is blocked.
 - Keep the logical width at 360, with variable logical height and responsive letterboxing.
 - Mobile portrait is the primary target, but desktop keyboard play must keep working.
 - Keep gameplay randomness on the seeded `mulberry32` stream. Cosmetic variation must not change the gameplay RNG sequence.
