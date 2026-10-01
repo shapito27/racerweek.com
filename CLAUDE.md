@@ -53,6 +53,7 @@ The visible launch content must stay real DOM content, not Canvas-only text. The
 - A text-only Twitter summary card. Do not declare a large-image card unless an actual social image is added.
 - JSON-LD co-typed as `VideoGame` and `WebApplication`, with `GameApplication`, browser/OS details and a zero-price offer.
 - `robots.txt`, `sitemap.xml` and a top-level no-index `404.html`.
+- `favicon.ico` (16/32/48), `favicon.svg` and `apple-touch-icon.png` (180 x 180), linked with root-absolute paths from `index.html` and `404.html`. They are the landing brand mark on `#090b14`. These are browser and crawler files only; the game itself still loads no images.
 
 The support files are crawler and deployment infrastructure, not game dependencies; keep them in production deployments. The top-level `404.html` matters: without it, Cloudflare Pages assumes a single-page app and can return the homepage for any path, which creates duplicate URLs and soft-404s.
 
@@ -119,7 +120,7 @@ After gameplay or rendering changes:
 9. Confirm the mute target, the debug corner gesture, the debug copy fallback, resize/orientation handling and pause-on-hidden.
 10. When changing timing or projection, test both the normal values and safe URL overrides such as `HITBOX_X=0`.
 11. For SEO changes, inspect the rendered title, description, canonical, social metadata, JSON-LD, visible `<h1>`, form label and nickname behaviour.
-12. For a production release, check that `/` returns `200`, `/robots.txt` returns `200 text/plain`, `/sitemap.xml` returns `200 application/xml`, and an unknown path returns a real `404` containing `noindex`.
+12. For a production release, check that `/` returns `200`, `/robots.txt` returns `200 text/plain`, `/sitemap.xml` returns `200 application/xml`, `/favicon.ico`, `/favicon.svg` and `/apple-touch-icon.png` return `200` with image content types, and an unknown path returns a real `404` containing `noindex`.
 
 Chromium currently shows no page errors. It does show a Canvas 2D performance warning, because the font-support probe calls `getImageData`; that happens during setup, not in the frame loop.
 
@@ -141,7 +142,8 @@ npx -y html-minifier-terser@7.2.0 index.html \
 npx -y html-minifier-terser@7.2.0 404.html \
   -o /tmp/racerweek-cloudflare-optimized/404.html \
   --collapse-whitespace --remove-comments --minify-css true
-cp robots.txt sitemap.xml /tmp/racerweek-cloudflare-optimized/
+cp robots.txt sitemap.xml favicon.ico favicon.svg apple-touch-icon.png \
+  /tmp/racerweek-cloudflare-optimized/
 npx -y wrangler@latest pages deploy /tmp/racerweek-cloudflare-optimized \
   --project-name racerweek --branch main --commit-dirty=true
 ```
