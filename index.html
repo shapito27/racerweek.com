@@ -1762,10 +1762,24 @@ function klsBakeRoadSigns(makeCanvas, b) {
 /* temporary roadworks signs requested by the game (ring buffer, no allocation). worldZ = where the sign stands. */
 const _twz = new Float64Array(12), _tside = new Int8Array(12), _tkind = new Int8Array(12), _tborn = new Float64Array(12); let _tn = 0, _tLast = -1e9;
 const KL_TEMP_KINDS = ['awas', 'roadworks', 'tamat'];
+const KL_TEMP_SHIFTS = [0, -8, -6, -10, -12, -14, -16, 6, 8];                       // slots tried in order when the requested one is taken
+/* true when a permanent road sign (or the Sepang sign) stands within `slots` of slot g on this side. Same slot rule as drawKLStreetSides. */
+function klsPermSignNear(side, g, slots) {
+  const E = side < 0 ? KL_SIGNS.EVERY_LEFT : KL_SIGNS.EVERY_RIGHT, m = (((g - (side < 0 ? 23 : 83)) % E) + E) % E;
+  if (m <= slots || m >= E - slots) return true;
+  return side === KL_SIGNS.SEPANG_SIDE && Math.abs(g - Math.round(KL_SIGNS.SEPANG_AT / KL_STREET.SLOT)) <= slots + 2;
+}
 function klsAddRoadworksSign(worldZ, side, kind, distanceNow) {
   if (worldZ - _tLast < 140 && kind !== 'tamat') return false;                     // not too often
-  let gs = Math.round(worldZ / KL_STREET.SLOT); const sd = side < 0 ? -1 : 1;
-  if (klsFlagPostNear(sd, gs, 5)) gs -= 8;                                          // never crowd a national banner: stand 16 m before it instead
+  const g0 = Math.round(worldZ / KL_STREET.SLOT), sd = side < 0 ? -1 : 1;
+  // never crowd a national banner or share a post position with a permanent
+  // sign: stand at the first clear slot nearby, or skip the sign if there is none
+  let gs = 0, clear = false;
+  for (let n = 0; n < KL_TEMP_SHIFTS.length && !clear; n++) {
+    gs = g0 + KL_TEMP_SHIFTS[n];
+    clear = !klsFlagPostNear(sd, gs, 5) && !klsPermSignNear(sd, gs, 5);
+  }
+  if (!clear) return false;
   const i = _tn % 12; _twz[i] = gs * KL_STREET.SLOT; _tside[i] = side < 0 ? -1 : 1;
   _tkind[i] = Math.max(0, KL_TEMP_KINDS.indexOf(kind || 'awas')); _tborn[i] = distanceNow || 0; _tn++; if (kind !== 'tamat') _tLast = worldZ; return true;
 }
