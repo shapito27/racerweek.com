@@ -42,6 +42,21 @@ LANDMARKS = [
     ("monorailStation", "bukitBintang", []),
 ]
 
+# District screenshots: zone key -> file name. The names are what README.md links to, so they
+# stay put when a zone is added to KL_ZONES; a zone that is not listed here gets no screenshot.
+DISTRICT_FILES = {
+    "bukitBintang": "district-1-bukitBintang.png",
+    "petalingStreet": "district-2-petalingStreet.png",
+    "pasarSeni": "district-3-pasarSeni.png",
+    "brickfields": "district-4-brickfields.png",
+    "dataranMerdeka": "district-5-dataranMerdeka.png",
+    "ilham": "district-6-ilham.png",
+    "klcc": "district-7-klcc.png",
+    "ampang": "district-8-ampang.png",
+    "batuCaves": "district-9-batuCaves.png",
+}
+STREET_SPEED = 72   # m/s, fixed for the whole screenshot run
+
 # Order of makeSprite() calls in buildSprites(); kapcai keys follow KAPCAI_KEYS.
 SPRITE_ORDER = ["playerCar", "hatchback", "kapcai", "kapcaiPlain",
                 "kapcaiJade", "kapcaiMelon", "kapcaiMagenta", "coneRow", "barrier"]
@@ -200,7 +215,7 @@ def export_streets(browser, url):
                               is_mobile=True, has_touch=True)
     page = ctx.new_page()
     page.clock.install()
-    page.goto(url + "?QUALITY=high&seed=7&SPEED_START=72&SPEED_MAX=72&HITBOX_X=0")
+    page.goto(url + "?QUALITY=high&seed=7&SPEED_START=%d&SPEED_MAX=%d&HITBOX_X=0" % (STREET_SPEED, STREET_SPEED))
     for _ in range(600):                                   # boot bakes are queued setTimeouts
         if page.evaluate("document.documentElement.hasAttribute('data-game-ready')"):
             break
@@ -208,20 +223,23 @@ def export_streets(browser, url):
     else:
         raise SystemExit("game never became ready")
     zones = page.evaluate("KL_ZONES.map(z => z.key)")
-    zone_dist = 400
+    zone_dist = page.evaluate("KL_STREET.ZONE_LEN")
     page.click("text=PLAY NOW")
     t = 0.0
     for i, key in enumerate(zones):
-        # Under the fake clock the run covers about 82.8 m per second plus ~38 m before the first frame
-        # (measured from the HUD score); aim for the middle of each zone.
-        # Batu Caves only takes over the skyline late (its gate is delayed), so shoot that one near the end.
+        name = DISTRICT_FILES.get(key)
+        if not name:
+            continue                                       # zone without a README shot
+        # SPEED_START = SPEED_MAX pins the speed, so distance is exactly speed * run time.
+        # (The HUD score is no use for calibration: it also counts pickup bonuses.)
+        # Aim for the middle of each zone. Batu Caves only takes over the skyline late
+        # (its gate is delayed), so shoot that one near the end.
         frac = 0.85 if key == 'batuCaves' else 0.5
-        target = ((i + frac) * zone_dist - 38) / 82.8
-        step = int((target - t) * 1000)
-        page.clock.run_for(step)
+        target = (i + frac) * zone_dist / STREET_SPEED
+        page.clock.run_for(int((target - t) * 1000))
         t = target
-        page.screenshot(path=str(OUT / ("district-%d-%s.png" % (i + 1, key))))
-        print("  wrote district-%d-%s.png" % (i + 1, key))
+        page.screenshot(path=str(OUT / name))
+        print("  wrote", name)
     ctx.close()
 
 
@@ -231,7 +249,13 @@ def main():
     httpd, url = serve()
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(channel="chrome")
+            try:
+                browser = p.chromium.launch(channel="chrome")
+            except Exception:
+                # No Google Chrome here (e.g. WSL): Playwright's own Chromium works, but it only has
+                # the fonts installed on this machine, so text can differ from the committed images.
+                print("WARNING: Google Chrome not found - using Playwright's bundled Chromium")
+                browser = p.chromium.launch()
             if what in ("all", "tiles"):
                 export_tiles(browser, url)
             if what in ("all", "streets"):
