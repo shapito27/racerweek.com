@@ -79,6 +79,11 @@ Every building in the game is drawn in code, line by line, from street photos of
 <td align="center" width="50%"><img src="docs/readme/img/landmark-littleIndiaGate.png" width="300" alt="Little India Gate in Racerweek"><br><sub>In the game</sub></td>
 <td align="center" width="50%"><img src="docs/readme/photos/littleIndiaGate.jpg" width="300" alt="Little India Gate, real photo"></td>
 </tr>
+<tr><td colspan="2" align="center"><b>Thean Hou Temple</b> · <sub>The quiet stretch after Little India · tiered roofs strung with lanterns on Robson Hill</sub></td></tr>
+<tr>
+<td align="center" width="50%"><img src="docs/readme/img/landmark-theanHou.png" width="300" alt="Thean Hou Temple in Racerweek"><br><sub>In the game</sub></td>
+<td align="center" width="50%"><img src="docs/readme/photos/theanHou.jpg" width="300" alt="Thean Hou Temple, real photo"></td>
+</tr>
 <tr><td colspan="2" align="center"><b>Ilham Tower</b> · <sub>The quiet stretch before KLCC · the steel diagonal grid</sub></td></tr>
 <tr>
 <td align="center" width="50%"><img src="docs/readme/img/landmark-ilhamTower.png" width="300" alt="Ilham Tower in Racerweek"><br><sub>In the game</sub></td>

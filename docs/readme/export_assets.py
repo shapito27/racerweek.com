@@ -35,6 +35,7 @@ LANDMARKS = [
     ("petalingGate", "petalingStreet", []),
     ("littleIndiaGate", "brickfields", []),
     ("sentralTowers", "brickfields", []),
+    ("theanHou", "theanHou", []),
     ("ilhamTower", "ilham", []),
     ("greatEasternMall", "ampang", []),
     ("batuCaves", "batuCaves", []),
