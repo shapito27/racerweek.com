@@ -49,6 +49,7 @@ DISTRICT_FILES = {
     "petalingStreet": "district-2-petalingStreet.png",
     "pasarSeni": "district-3-pasarSeni.png",
     "brickfields": "district-4-brickfields.png",
+    "theanHou": "district-4b-theanHou.png",
     "dataranMerdeka": "district-5-dataranMerdeka.png",
     "ilham": "district-6-ilham.png",
     "klcc": "district-7-klcc.png",

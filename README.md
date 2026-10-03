@@ -123,13 +123,16 @@ Every district has its own street: its own shopfronts, lamps, trees, pavement an
 </tr>
 <tr>
 <td align="center"><img src="docs/readme/img/district-4-brickfields.png" width="240" alt="Little India"><br><b>4 · Little India</b><br><sub>Arches, garlands, spiral lamps and flower stalls</sub></td>
+<td align="center"><img src="docs/readme/img/district-4b-theanHou.png" width="240" alt="Thean Hou Temple"><br><b>Thean Hou Temple</b><br><sub>A quiet tree-lined stretch up to the lantern-lit temple</sub></td>
 <td align="center"><img src="docs/readme/img/district-5-dataranMerdeka.png" width="240" alt="Dataran Merdeka"><br><b>5 · Dataran Merdeka</b><br><sub>Royal palms and the heritage lamps of the square</sub></td>
-<td align="center"><img src="docs/readme/img/district-6-ilham.png" width="240" alt="Towards KLCC"><br><b>Towards KLCC</b><br><sub>Ilham Tower rising on the left</sub></td>
 </tr>
 <tr>
+<td align="center"><img src="docs/readme/img/district-6-ilham.png" width="240" alt="Towards KLCC"><br><b>Towards KLCC</b><br><sub>Ilham Tower rising on the left</sub></td>
 <td align="center"><img src="docs/readme/img/district-7-klcc.png" width="240" alt="KLCC"><br><b>6 · KLCC</b><br><sub>The Twin Towers straight ahead</sub></td>
 <td align="center"><img src="docs/readme/img/district-8-ampang.png" width="240" alt="Jalan Ampang"><br><b>Jalan Ampang</b><br><sub>Past Great Eastern Mall</sub></td>
-<td align="center"><img src="docs/readme/img/district-9-batuCaves.png" width="240" alt="Batu Caves"><br><b>7 · Batu Caves</b><br><sub>The last stretch, under the golden statue</sub></td>
+</tr>
+<tr>
+<td align="center" colspan="3"><img src="docs/readme/img/district-9-batuCaves.png" width="240" alt="Batu Caves"><br><b>7 · Batu Caves</b><br><sub>The last stretch, under the golden statue</sub></td>
 </tr>
 </table>
 
