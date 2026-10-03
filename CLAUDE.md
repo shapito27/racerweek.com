@@ -74,7 +74,7 @@ Important data and rendering systems:
 - `CONFIG`: gameplay, projection, fog, zone and gate tunables. URL overrides are applied right after it is declared.
 - `KL_LANDMARKS`, `KL_PALETTES`, `KL_ZONES`, `KL_TRIO`: source of truth for landmark and zone art.
 - `KL_DISTRICTS`, `KL_STREET`, `KL_BOARDS`, `KL_SIGNS`: source of truth for street-level dressing.
-- `KL_ZONES` keys in route order: `bukitBintang`, `petalingStreet`, `pasarSeni`, `brickfields` (shown as LITTLE INDIA), `theanHou`*, `dataranMerdeka`, `ilham`*, `klcc`, `ampang`*, `batuCaves`. The keys marked * are `silent: true`. Only `bukitBintang` (`monorailStation`), `petalingStreet` and `brickfields` have a `gate:` landmark.
+- `KL_ZONES` keys in route order: `bukitBintang`, `petalingStreet`, `pasarSeni`, `brickfields` (shown as LITTLE INDIA), `theanHou`*, `dataranMerdeka`, `ilham`*, `klcc`, `ampang`*, `batuCaves`. The keys marked * are `silent: true`. Only `bukitBintang` (`monorailStation`), `petalingStreet` (`petalingGate`), `pasarSeni` (`kasturiGate`) and `brickfields` (`littleIndiaGate`) have a `gate:` landmark.
 - `STATIC_VISUALS`, `VISUAL_SIZE`, `LIGHT_ANCHOR`, `sprites`: obstacle and vehicle presentation.
 - `drawSkyAndSkyline`, `drawRoad`, `drawKLStreetBase`, `drawKLStreetSides`, `collectAndSort` and `render`: the main frame composition path.
 - `drawHUD`, `drawZoneBanner` and `drawScreens`: interface states.
