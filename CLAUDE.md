@@ -8,14 +8,16 @@ Racerweek is a self-contained mobile browser game: a three-lane endless dodger s
 
 The original prototype contract (`greybox-A-lanes.md`) was removed from the tree; it is still in git history (before the licence commit) if the core-loop, collision, scoring or determinism rationale is ever needed.
 
-The reference images live in `assets-archive/` (for example `unnamed (2).jpg` for the target look, and `kl-signs-sheet.png` / `kl-signs-in-street.png` for signage) and in `twintower/`. They are references only: the game draws everything with inline Canvas 2D code and must not depend on image files. `arhive/index.html` is the version from before the route was expanded; do not edit it.
+Local, untracked reference photos live in `arhive/` (for example `unnamed (2).jpg` for the target look, plus Thean Hou Temple photos). They are references only: the game draws everything with inline Canvas 2D code and must not depend on image files. Never commit them.
+
+`docs/superpowers/specs/2026-09-21-metrics-identity-leaderboard-design.md` is an approved but **unimplemented** design (Cloudflare D1 run storage, Google-owned racer names). Read it before touching metrics, identity or storage keys, and do not assume any of it exists yet.
 
 ## Running and testing
 
 `index.html` works from `file://`. For browser automation a static server is easier:
 
 ```sh
-python -m http.server 8000     # then open http://127.0.0.1:8000/index.html
+python3 -m http.server 8000    # then open http://127.0.0.1:8000/index.html
 ```
 
 There is no lint or test runner. The tests are the page's own self-tests: load `?selftest=1` and read the `[selftest]` console lines. They run from `runNextBootTask()` after the boot bake queue finishes:
@@ -38,6 +40,8 @@ Query parameters:
 - Any `CONFIG` key can be overridden, for example `?SPEED_START=30&ROW_GAP_T_START=1.4`. `?HITBOX_X=0` disables collisions, for observation-only runs.
 
 For visual checks, test at least 360 x 780 (a tall phone), 360 x 560 (the shortest supported portrait ratio) and 1280 x 720 (desktop letterboxing and keyboard play).
+
+The README images in `docs/readme/img/` are rendered by the game's own drawing code. Refresh them after art changes with `python3 docs/readme/export_assets.py` (or pass `tiles` or `streets`). It needs `pip install playwright` and an installed Google Chrome. Attributions for the real-world comparison photos are in `docs/readme/photos/credits.json`.
 
 The landing-page nickname is optional, and the field is currently hidden (`hidden` on `#playerName` and its label; remove both to bring it back). A name saved earlier is still pre-filled into the hidden field and applied, so returning players keep their tester name. A non-empty value is normalized, limited to 20 characters, stored as `racerweek_player_name`, and copied into `session.tester` (so it overrides `?t=`). An empty value starts immediately with no tester name. `PLAY NOW` enters the game. After that, mobile uses Pointer Events and desktop uses Arrow Left/Right or A/D. Space/Enter resumes or retries.
 
@@ -70,6 +74,7 @@ Important data and rendering systems:
 - `CONFIG`: gameplay, projection, fog, zone and gate tunables. URL overrides are applied right after it is declared.
 - `KL_LANDMARKS`, `KL_PALETTES`, `KL_ZONES`, `KL_TRIO`: source of truth for landmark and zone art.
 - `KL_DISTRICTS`, `KL_STREET`, `KL_BOARDS`, `KL_SIGNS`: source of truth for street-level dressing.
+- `KL_ZONES` keys in route order: `bukitBintang`, `petalingStreet`, `pasarSeni`, `brickfields` (shown as LITTLE INDIA), `theanHou`*, `dataranMerdeka`, `ilham`*, `klcc`, `ampang`*, `batuCaves`. The keys marked * are `silent: true`. Only `bukitBintang` (`monorailStation`), `petalingStreet` and `brickfields` have a `gate:` landmark.
 - `STATIC_VISUALS`, `VISUAL_SIZE`, `LIGHT_ANCHOR`, `sprites`: obstacle and vehicle presentation.
 - `drawSkyAndSkyline`, `drawRoad`, `drawKLStreetBase`, `drawKLStreetSides`, `collectAndSort` and `render`: the main frame composition path.
 - `drawHUD`, `drawZoneBanner` and `drawScreens`: interface states.
@@ -114,7 +119,7 @@ After gameplay or rendering changes:
 3. Test both ways in: no saved name, and a saved `racerweek_player_name` (check it gets normalized). Both must dismiss the landing page and start play; only the saved one should set a tester name. If the nickname field is visible again, also test typing a name. Check the landing skyline appears after `PLAY NOW` is enabled and does not cover the copy.
 4. Run `?selftest=1` and check the expected lines above.
 5. Check the launch, PLAYING, PAUSED, DEAD and retry states.
-6. Check every district: Bukit Bintang, Jalan Petaling, Pasar Seni, Little India, the silent Thean Hou Temple stretch, Dataran Merdeka, the silent Ilham stretch, KLCC, the silent Jalan Ampang stretch (Great Eastern Mall) and Batu Caves. Verify each announced zone's gate and transition. The silent stretches intentionally have no gate, title, chime or player-facing name, so a death at Thean Hou must report Little India, a death in Ilham must report Dataran Merdeka and a death in Ampang must report KLCC as the last announced zone.
+6. Check every district: Bukit Bintang, Jalan Petaling, Pasar Seni, Little India, the silent Thean Hou Temple stretch, Dataran Merdeka, the silent Ilham stretch, KLCC, the silent Jalan Ampang stretch (Great Eastern Mall) and Batu Caves. Verify each announced zone's transition and banner, plus the gate where the zone has one. The silent stretches intentionally have no gate, title, chime or player-facing name, so a death at Thean Hou must report Little India, a death in Ilham must report Dataran Merdeka and a death in Ampang must report KLCC as the last announced zone.
 7. Check hazards and pickups at far, mid and collision distance, not only in static beauty shots.
 8. Check 360 x 780, 360 x 560 and a desktop landscape viewport.
 9. Confirm the mute target, the debug corner gesture, the debug copy fallback, resize/orientation handling and pause-on-hidden.
@@ -130,25 +135,26 @@ Production is the Cloudflare Pages project `racerweek`, with canonical domain `h
 - **Custom domains:** apex and `www` are both configured. `www` should 301 to the apex through a zone Redirect Rule, so the game only ever runs on one origin (one `localStorage`, one cookie).
 - **`racerweek.pages.dev`:** not a public alternative. A Bulk Redirect sends it and its subpaths to the canonical domain with a 301, keeping paths and query strings.
 
-Do not deploy the project directory as-is, because it contains reference material. Build a small temporary folder with only the production files:
+Do not deploy the project directory as-is, because it contains reference material. Build a small temporary folder with only the production files. npx runs inside a throwaway `node:22` container, never on the host:
 
 ```sh
-mkdir -p /tmp/racerweek-cloudflare-optimized
-npx -y html-minifier-terser@7.2.0 index.html \
-  -o /tmp/racerweek-cloudflare-optimized/index.html \
+OUT=/tmp/racerweek-cloudflare-optimized
+mkdir -p "$OUT"
+NODE="docker run --rm --user $(id -u):$(id -g) -e HOME=/tmp -v $PWD:/w:ro -v $OUT:/out -w /w node:22"
+$NODE npx -y html-minifier-terser@7.2.0 index.html -o /out/index.html \
   --collapse-whitespace --remove-comments --remove-redundant-attributes \
   --remove-script-type-attributes --remove-style-link-type-attributes \
   --minify-css true --minify-js true
-npx -y html-minifier-terser@7.2.0 404.html \
-  -o /tmp/racerweek-cloudflare-optimized/404.html \
+$NODE npx -y html-minifier-terser@7.2.0 404.html -o /out/404.html \
   --collapse-whitespace --remove-comments --minify-css true
-cp robots.txt sitemap.xml favicon.ico favicon.svg apple-touch-icon.png \
-  /tmp/racerweek-cloudflare-optimized/
-npx -y wrangler@latest pages deploy /tmp/racerweek-cloudflare-optimized \
+cp robots.txt sitemap.xml favicon.ico favicon.svg apple-touch-icon.png "$OUT"/
+docker run --rm -e HOME=/tmp -e CLOUDFLARE_API_TOKEN -e CLOUDFLARE_ACCOUNT_ID \
+  -v "$OUT":/out:ro node:22 \
+  npx -y wrangler@latest pages deploy /out \
   --project-name racerweek --branch main --commit-dirty=true
 ```
 
-`--branch main` is a Pages deployment label, not a git branch.
+A host `wrangler login` does not carry into the container, so export `CLOUDFLARE_API_TOKEN` (Pages edit permission) and `CLOUDFLARE_ACCOUNT_ID` first. Never write them into a tracked file. `--branch main` is a Pages deployment label, not a git branch.
 
 After deploying:
 - **Check the custom domain,** not just the unique deployment URL.
